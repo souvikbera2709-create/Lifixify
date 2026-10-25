@@ -8,9 +8,15 @@ import {
 } from 'lucide-react';
 
 const PRESET_EXERCISES = [
-  'Barbell Bench Press','Barbell Back Squat','Deadlift',
-  'Weighted Pull-ups','Overhead Press','Incline Dumbbell Press','Barbell Row'
+  "Incline Dumbbell Press",
+  "Barbell Bench Press",
+  "Barbell Back Squat",
+  "Deadlift",
+  "Weighted Pull-ups",
+  "Overhead Press",
+  "Barbell Row"
 ];
+const CUSTOM_OPTION = "Other / Custom Exercise...";
 
 const today = () => new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
 
@@ -49,11 +55,12 @@ export const FitnessNutritionHub = () => {
   const [activeTab, setActiveTab] = useState('workouts');
 
   // ── Workout state ──────────────────────────────────────────────
-  const [workouts,       setWorkouts]       = useState([]);
-  const [exerciseInput,  setExerciseInput]  = useState(PRESET_EXERCISES[0]);
-  const [setsInput,      setSetsInput]      = useState(3);
-  const [repsInput,      setRepsInput]      = useState(10);
-  const [weightInput,    setWeightInput]    = useState(60);
+  const [workouts,           setWorkouts]           = useState([]);
+  const [selectedExercise,   setSelectedExercise]   = useState(PRESET_EXERCISES[0]);
+  const [customExerciseName, setCustomExerciseName] = useState("");
+  const [setsInput,          setSetsInput]          = useState(3);
+  const [repsInput,          setRepsInput]          = useState(10);
+  const [weightInput,        setWeightInput]        = useState(60);
 
   // ── Persistent targets ─────────────────────────────────────────
   const [targets, setTargets] = useState(loadTargets);
@@ -115,16 +122,45 @@ export const FitnessNutritionHub = () => {
   // ── Handlers ──────────────────────────────────────────────────
   const handleAddWorkout = async (e) => {
     e.preventDefault();
-    if (!exerciseInput.trim()) return;
-    const entry = { exercise: exerciseInput.trim(), sets: +setsInput || 1, reps: +repsInput || 10, weight: +weightInput || 0 };
+    const finalExerciseName = selectedExercise === CUSTOM_OPTION
+      ? customExerciseName.trim()
+      : selectedExercise.trim();
+
+    if (!finalExerciseName) {
+      alert("Please enter or select an exercise name");
+      return;
+    }
+
+    const entry = {
+      exercise: finalExerciseName,
+      sets: Math.max(1, +setsInput || 1),
+      reps: Math.max(0, +repsInput || 10),
+      weight: Math.max(0, +weightInput || 0)
+    };
+
     const updated = [...workouts, entry];
+    setWorkouts(updated);
+
+    if (selectedExercise === CUSTOM_OPTION) {
+      setCustomExerciseName("");
+    }
+
+    try {
+      await api.fitness.logWorkout({ workouts: updated });
+    } catch (err) {
+      console.error("Failed to log workout to backend:", err);
+    }
+  };
+
+  const handleRemoveWorkout = async (idx) => {
+    const updated = workouts.filter((_, i) => i !== idx);
     setWorkouts(updated);
     try {
       await api.fitness.logWorkout({ workouts: updated });
-    } catch {}
+    } catch (err) {
+      console.error("Failed to update workouts after delete:", err);
+    }
   };
-
-  const handleRemoveWorkout = (idx) => setWorkouts(w => w.filter((_, i) => i !== idx));
 
   const handleAddMeal = (e) => {
     e.preventDefault();
@@ -235,27 +271,65 @@ export const FitnessNutritionHub = () => {
       {activeTab === 'workouts' && (
         <div className="space-y-4">
           {/* Add workout form */}
-          <form onSubmit={handleAddWorkout} className={`p-4 rounded-2xl ${cardBg} border grid grid-cols-2 sm:grid-cols-4 gap-3`}>
-            <div className="col-span-2 sm:col-span-4 flex items-center gap-2">
+          <form onSubmit={handleAddWorkout} className={`p-4 rounded-2xl ${cardBg} border space-y-3`}>
+            <div className="flex items-center gap-2">
               <Dumbbell className="w-4 h-4 text-cyan-400 shrink-0" />
-              <span className={`text-xs font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Log Exercise</span>
+              <span className={`text-xs font-bold ${isDark ? "text-slate-300" : "text-slate-700"}`}>Log Exercise</span>
             </div>
-            <select value={exerciseInput} onChange={e => setExerciseInput(e.target.value)} className={`col-span-2 sm:col-span-1 px-3 py-2 rounded-xl border text-xs outline-none ${inputCls}`}>
-              {PRESET_EXERCISES.map(ex => <option key={ex} value={ex}>{ex}</option>)}
-            </select>
-            {[
-              { label: 'Sets', value: setsInput, set: setSetsInput, min: 1 },
-              { label: 'Reps', value: repsInput, set: setRepsInput, min: 1 },
-              { label: 'Weight (kg)', value: weightInput, set: setWeightInput, min: 0 },
-            ].map(f => (
-              <input key={f.label} type="number" min={f.min} value={f.value}
-                onChange={e => f.set(e.target.value)}
-                placeholder={f.label}
-                className={`px-3 py-2 rounded-xl border text-xs outline-none focus:border-cyan-500 ${inputCls}`}
-              />
-            ))}
-            <button type="submit" className="col-span-2 sm:col-span-4 w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
-              <Plus className="w-4 h-4" />Log Exercise
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="col-span-2 sm:col-span-1">
+                <label className={`text-[10px] uppercase font-bold tracking-wider block mb-1 ${textSub}`}>Exercise</label>
+                <select
+                  value={selectedExercise}
+                  onChange={e => setSelectedExercise(e.target.value)}
+                  className={`w-full px-3 py-2 rounded-xl border text-xs outline-none focus:border-cyan-500 ${inputCls}`}
+                >
+                  {PRESET_EXERCISES.map(ex => <option key={ex} value={ex}>{ex}</option>)}
+                  <option value={CUSTOM_OPTION}>{CUSTOM_OPTION}</option>
+                </select>
+              </div>
+
+              {[
+                { label: "Sets", value: setsInput, set: setSetsInput, min: 1 },
+                { label: "Reps", value: repsInput, set: setRepsInput, min: 1 },
+                { label: "Weight (kg)", value: weightInput, set: setWeightInput, min: 0 },
+              ].map(f => (
+                <div key={f.label} className="col-span-1">
+                  <label className={`text-[10px] uppercase font-bold tracking-wider block mb-1 ${textSub}`}>{f.label}</label>
+                  <input
+                    type="number"
+                    min={f.min}
+                    value={f.value}
+                    onChange={e => f.set(e.target.value)}
+                    placeholder={f.label}
+                    className={`w-full px-3 py-2 rounded-xl border text-xs outline-none focus:border-cyan-500 ${inputCls}`}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Custom Exercise Name Input (displayed when "Other / Custom Exercise..." is selected) */}
+            {selectedExercise === CUSTOM_OPTION && (
+              <div className="animate-fade-in pt-1">
+                <label className="text-[11px] font-semibold block mb-1 text-cyan-300">Custom Exercise Name</label>
+                <input
+                  type="text"
+                  autoFocus
+                  value={customExerciseName}
+                  onChange={e => setCustomExerciseName(e.target.value)}
+                  placeholder="e.g. Antigravity Pull-ups, Kettlebell Swings, Cable Flyes..."
+                  required
+                  className={`w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 ${inputCls}`}
+                />
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />+ Log Exercise
             </button>
           </form>
 
@@ -264,20 +338,27 @@ export const FitnessNutritionHub = () => {
             {workouts.length === 0 && (
               <p className={`text-center text-xs py-6 ${textSub}`}>No exercises logged today. Add one above.</p>
             )}
-            {(workouts || []).map((w, i) => (
-              <div key={i} className={`p-3.5 rounded-2xl ${cardBg} border flex items-center justify-between gap-3 hover:border-cyan-500/40 transition-colors`}>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-xs border border-cyan-500/20">#{i + 1}</div>
-                  <div>
-                    <h4 className={`font-display font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{w.exercise}</h4>
-                    <p className="text-xs text-slate-400 font-mono mt-0.5">{w.sets} Sets &times; {w.reps} Reps @ <strong className="text-cyan-300">{w.weight} kg</strong></p>
+            {(workouts || []).map((w, i) => {
+              const displayName = w.exercise || w.exerciseName || w.name || "Custom Exercise";
+              return (
+                <div key={i} className={`p-3.5 rounded-2xl ${cardBg} border flex items-center justify-between gap-3 hover:border-cyan-500/40 transition-colors`}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-xs border border-cyan-500/20">#{i + 1}</div>
+                    <div>
+                      <h4 className={`font-display font-bold text-sm ${isDark ? "text-white" : "text-slate-900"}`}>{displayName}</h4>
+                      <p className="text-xs text-slate-400 font-mono mt-0.5">{w.sets} Sets &times; {w.reps} Reps @ <strong className="text-cyan-300">{w.weight} kg</strong></p>
+                    </div>
                   </div>
+                  <button
+                    onClick={() => handleRemoveWorkout(i)}
+                    className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                    title="Delete exercise log"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
-                <button onClick={() => handleRemoveWorkout(i)} className="p-1 rounded text-slate-500 hover:text-rose-400 cursor-pointer">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

@@ -61,11 +61,25 @@ router.post('/log', async (req, res, next) => {
     const targetDate = date ? new Date(date) : new Date();
     const { start, end } = getDayBounds(targetDate);
 
+    // Normalize workouts to accept exercise, exerciseName, or name from any client payload
+    let normalizedWorkouts = undefined;
+    if (workouts && Array.isArray(workouts)) {
+      normalizedWorkouts = workouts.map(w => {
+        const title = (w.exercise || w.exerciseName || w.name || "").trim();
+        return {
+          exercise: title,
+          sets: Math.max(1, Number(w.sets) || 1),
+          reps: Math.max(0, Number(w.reps) || 10),
+          weight: Math.max(0, Number(w.weight) || 0)
+        };
+      }).filter(w => w.exercise.length > 0);
+    }
+
     let log = await FitnessLog.findOne({ userId: req.user.id, date: { $gte: start, $lte: end } });
     const isNew = !log;
 
     if (log) {
-      if (workouts) log.workouts = workouts;
+      if (normalizedWorkouts !== undefined) log.workouts = normalizedWorkouts;
       if (nutrition) {
         log.nutrition = {
           calories: nutrition.calories ?? log.nutrition.calories,
@@ -80,13 +94,13 @@ router.post('/log', async (req, res, next) => {
       log = await FitnessLog.create({
         userId: req.user.id,
         date: targetDate,
-        workouts: workouts || [],
+        workouts: normalizedWorkouts || [],
         nutrition: nutrition || {}
       });
     }
 
     let rewards = null;
-    if (isNew || (workouts && workouts.length > 0)) {
+    if (isNew || (normalizedWorkouts && normalizedWorkouts.length > 0)) {
       const user = await User.findById(req.user.id);
       rewards = await awardUserRewards(user, { xp: 30, coins: 10, context: { fitnessLogged: true } });
     }

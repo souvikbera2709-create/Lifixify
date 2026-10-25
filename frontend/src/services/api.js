@@ -152,6 +152,15 @@ export const api = {
         body: JSON.stringify(payload)
       });
       return handleResponse(res);
+    },
+    logWorkout: async (payload) => {
+      const res = await fetch(`${API_BASE}/fitness/log`, {
+        method: 'POST',
+        headers: getHeaders(),
+        credentials: 'include',
+        body: JSON.stringify(payload)
+      });
+      return handleResponse(res);
     }
   },
 
