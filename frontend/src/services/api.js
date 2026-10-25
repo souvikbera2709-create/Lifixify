@@ -3,26 +3,39 @@
  * Connects frontend modules to Express/MongoDB/Gemini backend
  */
 
-// ── API Base URL ─────────────────────────────────────────────────────
-// Priority:
-//   1. VITE_API_BASE_URL env var (set in .env / .env.production / Vercel dashboard)
-//   2. Auto-detect: if running on a Vercel deploy (*.vercel.app), use the Render backend
-//   3. Fallback: http://localhost:5001 (local dev)
-const _envUrl = import.meta.env.VITE_API_BASE_URL;
-
-// Build the Render backend URL from parts to prevent build-tool URL rewriting
+// ── API Base URL Resolution ──────────────────────────────────────────
+// Handles any malformed env variables (e.g. markdown links, extra brackets, quotes)
 const _PROTO = 'https';
 const _HOST = 'lifixify.onrender.com';
-const RENDER_BACKEND = _PROTO + '://' + _HOST;
+const RENDER_BACKEND = `${_PROTO}://${_HOST}`;
+
+function sanitizeUrl(raw) {
+  if (!raw || typeof raw !== 'string') return '';
+  let url = raw.trim();
+  // If wrapped in markdown link syntax [text](url) or [url]
+  const mdMatch = url.match(/\((https?:\/\/[^)]+)\)/) || url.match(/\[(https?:\/\/[^\]]+)\]/);
+  if (mdMatch) {
+    url = mdMatch[1];
+  }
+  // Strip any leading/trailing brackets, parentheses, or quotes
+  url = url.replace(/^[[\("'\s]+|[]\)"'\s]+$/g, '').trim();
+  // Strip trailing slashes
+  url = url.replace(/\/+$/, '');
+  return url;
+}
 
 function resolveBaseUrl() {
-  // 1. Explicit env var always wins
-  if (_envUrl && _envUrl.startsWith('http')) return _envUrl.replace(/\/+$/, '');
+  const envUrl = sanitizeUrl(import.meta.env.VITE_API_BASE_URL);
 
-  // 2. Auto-detect production: if running on Vercel, point to Render backend
+  // 1. Clean env var always wins if it is a valid HTTP(S) URL
+  if (envUrl.startsWith('http://') || envUrl.startsWith('https://')) {
+    return envUrl;
+  }
+
+  // 2. Auto-detect production: if on Vercel or any live host, point to Render backend
   if (typeof window !== 'undefined') {
     const h = window.location.hostname;
-    if (h.endsWith('.vercel.app') || h === 'lifixify.vercel.app') {
+    if (h.endsWith('.vercel.app') || h === 'lifixify.vercel.app' || (h !== 'localhost' && h !== '127.0.0.1')) {
       return RENDER_BACKEND;
     }
   }
@@ -35,7 +48,7 @@ const rawBaseUrl = resolveBaseUrl();
 
 // Normalise: strip trailing slashes, ensure path ends with /api exactly once
 const _clean = rawBaseUrl.replace(/\/+$/, '');
-const API_BASE = _clean.endsWith('/api') ? _clean : _clean + '/api';
+const API_BASE = _clean.endsWith('/api') ? _clean : `${_clean}/api`;
 
 const getHeaders = () => {
   const token = localStorage.getItem('lifixify_token');
