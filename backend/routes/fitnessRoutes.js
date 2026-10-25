@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const FitnessLog = require('../models/FitnessLog');
+const CustomExercise = require('../models/CustomExercise');
 const User = require('../models/User');
 const verifyToken = require('../middleware/verifyToken');
 const { awardUserRewards } = require('../utils/gamification');
@@ -54,6 +55,62 @@ router.get('/date/:date', async (req, res, next) => {
   }
 });
 
+// @route   GET /api/fitness/exercises
+router.get('/exercises', async (req, res, next) => {
+  try {
+    const exercises = await CustomExercise.find({ userId: req.user.id }).sort({ name: 1 });
+    res.status(200).json({ success: true, count: exercises.length, exercises });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// @route   POST /api/fitness/exercises
+router.post('/exercises', async (req, res, next) => {
+  try {
+    const { name, category } = req.body;
+    if (!name || !name.trim()) {
+      return res.status(400).json({ success: false, message: 'Exercise name is required' });
+    }
+    const trimmed = name.trim();
+    const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    let exercise = await CustomExercise.findOne({
+      userId: req.user.id,
+      name: new RegExp(`^${escaped}$`, 'i')
+    });
+    if (exercise) {
+      return res.status(200).json({ success: true, exercise, message: 'Exercise already exists' });
+    }
+    exercise = await CustomExercise.create({
+      userId: req.user.id,
+      name: trimmed,
+      category: category ? category.trim() : 'Strength'
+    });
+    res.status(201).json({ success: true, exercise, message: 'Custom exercise created' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// @route   DELETE /api/fitness/exercises/:id
+router.delete('/exercises/:id', async (req, res, next) => {
+  try {
+    let deleted = null;
+    if (req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+      deleted = await CustomExercise.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    }
+    if (!deleted) {
+      deleted = await CustomExercise.findOneAndDelete({ name: req.params.id, userId: req.user.id });
+    }
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: 'Custom exercise not found' });
+    }
+    res.status(200).json({ success: true, message: 'Custom exercise deleted' });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // @route   POST /api/fitness/log
 router.post('/log', async (req, res, next) => {
   try {
@@ -65,7 +122,7 @@ router.post('/log', async (req, res, next) => {
     let normalizedWorkouts = undefined;
     if (workouts && Array.isArray(workouts)) {
       normalizedWorkouts = workouts.map(w => {
-        const title = (w.exercise || w.exerciseName || w.name || "").trim();
+        const title = (w.exercise || w.exerciseName || w.name || '').trim();
         return {
           exercise: title,
           sets: Math.max(1, Number(w.sets) || 1),

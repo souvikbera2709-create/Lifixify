@@ -20,9 +20,18 @@ const getHeaders = () => {
 };
 
 const handleResponse = async (res) => {
-  const data = await res.json().catch(() => ({}));
+  let data = {};
+  try {
+    data = await res.json();
+  } catch {
+    // Response had no JSON body (e.g. 204 No Content)
+  }
   if (!res.ok) {
-    throw new Error(data.message || `Request failed with status ${res.status}`);
+    const message = data?.message || data?.error || `Request failed with status ${res.status}`;
+    const err = new Error(message);
+    err.status = res.status;
+    err.data = data;
+    throw err;
   }
   return data;
 };
@@ -159,6 +168,30 @@ export const api = {
         headers: getHeaders(),
         credentials: 'include',
         body: JSON.stringify(payload)
+      });
+      return handleResponse(res);
+    },
+    getCustomExercises: async () => {
+      const res = await fetch(`${API_BASE}/fitness/exercises`, {
+        headers: getHeaders(),
+        credentials: 'include'
+      });
+      return handleResponse(res);
+    },
+    addCustomExercise: async (name, category = 'Strength') => {
+      const res = await fetch(`${API_BASE}/fitness/exercises`, {
+        method: 'POST',
+        headers: getHeaders(),
+        credentials: 'include',
+        body: JSON.stringify({ name, category })
+      });
+      return handleResponse(res);
+    },
+    deleteCustomExercise: async (id) => {
+      const res = await fetch(`${API_BASE}/fitness/exercises/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+        credentials: 'include'
       });
       return handleResponse(res);
     }

@@ -20,9 +20,30 @@ mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 8000 })
   .catch((err) => console.error('❌ MongoDB Connection Error:', err.message));
 
 // Middlewares
+const ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5001',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
+];
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'],
-  credentials: true
+  origin: (origin, callback) => {
+    // Allow requests with no origin (server-to-server, curl, Postman)
+    if (!origin) return callback(null, true);
+    // Allow any Vercel deployment or local origins
+    const isVercel = /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin);
+    const isRender = /^https:\/\/[a-zA-Z0-9-]+\.onrender\.com$/.test(origin);
+    if (ALLOWED_ORIGINS.includes(origin) || isVercel || isRender) {
+      return callback(null, true);
+    }
+    console.warn(`⚠️  CORS blocked origin: ${origin}`);
+    return callback(new Error(`CORS policy: origin ${origin} not allowed`));
+  },
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

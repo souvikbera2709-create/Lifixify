@@ -4,7 +4,7 @@ import { api } from '../services/api';
 import {
   Activity, Dumbbell, Droplet, Flame,
   Plus, Trash2, CheckCircle2, TrendingUp,
-  Settings, X, Zap, Coins, Gift
+  Settings, X, Zap, Coins, Gift, Pencil, Loader2
 } from 'lucide-react';
 
 const PRESET_EXERCISES = [
@@ -84,6 +84,61 @@ export const FitnessNutritionHub = () => {
   const [editTargets, setEditTargets] = useState(false);
   const [draftTargets, setDraftTargets] = useState(targets);
 
+  // ── Custom Exercise Manager ───────────────────────────────────
+  const [customExercises,    setCustomExercises]    = useState([]);
+  const [showManageEx,       setShowManageEx]       = useState(false);
+  const [newExName,          setNewExName]          = useState('');
+  const [newExCategory,      setNewExCategory]      = useState('Strength');
+  const [exLoading,          setExLoading]          = useState(false);
+  const [exSaving,           setExSaving]           = useState(false);
+
+  const fetchCustomExercises = useCallback(async () => {
+    setExLoading(true);
+    try {
+      const data = await api.fitness.getCustomExercises();
+      if (data.success) setCustomExercises(data.exercises || []);
+    } catch (err) {
+      console.error('Failed to fetch custom exercises:', err);
+    } finally {
+      setExLoading(false);
+    }
+  }, []);
+
+  const handleAddCustomExercise = async (e) => {
+    e.preventDefault();
+    if (!newExName.trim()) return;
+    setExSaving(true);
+    try {
+      const data = await api.fitness.addCustomExercise(newExName.trim(), newExCategory);
+      if (data.success) {
+        setCustomExercises(prev => {
+          const exists = prev.some(ex => ex._id === data.exercise._id);
+          return exists ? prev : [...prev, data.exercise].sort((a, b) => a.name.localeCompare(b.name));
+        });
+        setNewExName('');
+      }
+    } catch (err) {
+      console.error('Failed to add custom exercise:', err);
+    } finally {
+      setExSaving(false);
+    }
+  };
+
+  const handleDeleteCustomExercise = async (id) => {
+    try {
+      await api.fitness.deleteCustomExercise(id);
+      setCustomExercises(prev => prev.filter(ex => ex._id !== id));
+    } catch (err) {
+      console.error('Failed to delete custom exercise:', err);
+    }
+  };
+
+  // Combined dropdown options: presets + custom exercises
+  const allExerciseOptions = [
+    ...PRESET_EXERCISES,
+    ...customExercises.map(ex => ex.name),
+  ];
+
   // Sync from backend once
   useEffect(() => {
     api.fitness.getToday().then(data => {
@@ -91,7 +146,8 @@ export const FitnessNutritionHub = () => {
         if (data.log.workouts?.length) setWorkouts(data.log.workouts);
       }
     }).catch(() => {});
-  }, []);
+    fetchCustomExercises();
+  }, [fetchCustomExercises]);
 
   // Persist consumed on change
   useEffect(() => { saveConsumed(consumed); }, [consumed]);
@@ -275,6 +331,13 @@ export const FitnessNutritionHub = () => {
             <div className="flex items-center gap-2">
               <Dumbbell className="w-4 h-4 text-cyan-400 shrink-0" />
               <span className={`text-xs font-bold ${isDark ? "text-slate-300" : "text-slate-700"}`}>Log Exercise</span>
+              <button
+                type="button"
+                onClick={() => { setShowManageEx(true); fetchCustomExercises(); }}
+                className={`ml-auto flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${isDark ? 'bg-indigo-900/40 hover:bg-indigo-800/60 text-indigo-300 border border-indigo-700/50' : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200'}`}
+              >
+                <Pencil className="w-3 h-3" />Manage Exercises
+              </button>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -285,7 +348,11 @@ export const FitnessNutritionHub = () => {
                   onChange={e => setSelectedExercise(e.target.value)}
                   className={`w-full px-3 py-2 rounded-xl border text-xs outline-none focus:border-cyan-500 ${inputCls}`}
                 >
-                  {PRESET_EXERCISES.map(ex => <option key={ex} value={ex}>{ex}</option>)}
+                  {allExerciseOptions.length > 0 && (
+                    <optgroup label="── Exercises ──">
+                      {allExerciseOptions.map(ex => <option key={ex} value={ex}>{ex}</option>)}
+                    </optgroup>
+                  )}
                   <option value={CUSTOM_OPTION}>{CUSTOM_OPTION}</option>
                 </select>
               </div>
@@ -443,6 +510,94 @@ export const FitnessNutritionHub = () => {
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* ── Manage Exercises Modal ── */}
+      {showManageEx && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className={`w-full max-w-md ${isDark ? 'bg-[#0d1322] border-indigo-500/30' : 'bg-white border-slate-200'} border rounded-3xl p-6 shadow-2xl flex flex-col max-h-[90vh]`}>
+            {/* Header */}
+            <div className={`flex items-center justify-between pb-3 border-b ${isDark ? 'border-slate-800' : 'border-slate-200'} mb-4`}>
+              <h3 className={`font-bold text-base flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <Dumbbell className="w-4 h-4 text-cyan-400" />Exercise Manager
+              </h3>
+              <button onClick={() => setShowManageEx(false)} className={`${textSub} cursor-pointer`}><X className="w-5 h-5" /></button>
+            </div>
+
+            {/* Add new exercise */}
+            <form onSubmit={handleAddCustomExercise} className="space-y-2 mb-4">
+              <p className={`text-[11px] font-semibold ${textSub} uppercase tracking-wider`}>Add Custom Exercise</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newExName}
+                  onChange={e => setNewExName(e.target.value)}
+                  placeholder="e.g. Antigravity Pull-ups"
+                  className={`flex-1 px-3 py-2 rounded-xl border text-xs outline-none focus:border-cyan-500 ${inputCls}`}
+                  required
+                />
+                <select
+                  value={newExCategory}
+                  onChange={e => setNewExCategory(e.target.value)}
+                  className={`px-2 py-2 rounded-xl border text-xs outline-none focus:border-cyan-500 ${inputCls}`}
+                >
+                  {['Strength','Cardio','Flexibility','HIIT','Sports','Other'].map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="submit"
+                disabled={exSaving || !newExName.trim()}
+                className="w-full py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white font-bold text-xs shadow transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                {exSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                {exSaving ? 'Saving...' : 'Add Exercise'}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className={`border-t ${isDark ? 'border-slate-800' : 'border-slate-100'} mb-3`} />
+
+            {/* Exercise list */}
+            <p className={`text-[11px] font-semibold ${textSub} uppercase tracking-wider mb-2`}>Your Custom Exercises ({customExercises.length})</p>
+            <div className="overflow-y-auto flex-1 space-y-1.5 pr-1">
+              {exLoading && (
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="w-5 h-5 animate-spin text-cyan-400" />
+                </div>
+              )}
+              {!exLoading && customExercises.length === 0 && (
+                <p className={`text-center text-xs py-6 ${textSub}`}>No custom exercises yet. Add one above!</p>
+              )}
+              {!exLoading && customExercises.map(ex => (
+                <div
+                  key={ex._id}
+                  className={`flex items-center justify-between px-3 py-2.5 rounded-xl border ${isDark ? 'bg-slate-900/60 border-slate-800 hover:border-slate-700' : 'bg-slate-50 border-slate-200'} transition-colors`}
+                >
+                  <div>
+                    <p className={`text-xs font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>{ex.name}</p>
+                    <p className={`text-[10px] ${textSub}`}>{ex.category}</p>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteCustomExercise(ex._id)}
+                    className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                    title="Delete custom exercise"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Preset hint */}
+            <div className={`mt-4 pt-3 border-t ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
+              <p className={`text-[10px] ${textSub}`}>
+                <strong className="text-cyan-400">{PRESET_EXERCISES.length} built-in presets</strong> + {customExercises.length} custom exercises are available in your Log Exercise dropdown.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 

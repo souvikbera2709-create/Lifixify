@@ -31,7 +31,22 @@ export const AuthPage = () => {
         setError(data.message || 'Authentication failed. Please try again.');
       }
     } catch (err) {
-      setError(err.message || 'Something went wrong. Check your connection.');
+      console.error('Auth error:', err);
+      // Network failure (backend unreachable / no internet)
+      const isNetworkError = (
+        err instanceof TypeError ||
+        err.message === 'Failed to fetch' ||
+        err.message === 'Load failed' ||
+        err.message === 'NetworkError when attempting to fetch resource.' ||
+        err.message?.toLowerCase().includes('network') ||
+        err.message?.toLowerCase().includes('failed to fetch')
+      );
+      if (isNetworkError) {
+        setError('Unable to connect to server. Please check that the backend is running on port 5001.');
+      } else {
+        // Server responded with an error — use the server message
+        setError(err.message || 'Authentication failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
