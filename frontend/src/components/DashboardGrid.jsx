@@ -148,14 +148,133 @@ const CustomModuleCard = ({ cm }) => {
   );
 };
 
-export const DashboardGrid = () => {
-  const { user, isDark, activeModuleFilter = "All Modules", customModules = [], setActiveSidePanel } = useStore();
-
+// ── Top Summary Stat Cards Row Component (Only visible on Main Dashboard view) ──
+const TopSummaryStatsCards = ({ user, isDark, setActiveSidePanel }) => {
   const safeUser = user || {};
   const level = calculateLevelFromXp(safeUser.xp || 0);
   const rankTitle = getRankTitle(level);
   const xpInLvl = (safeUser.xp || 0) % 500;
   const progress = Math.min(100, (xpInLvl / 500) * 100);
+
+  const statCardBg = isDark
+    ? "bg-[#111e18] border-[#1a2f26]"
+    : "bg-white border-[#EEF2F0] shadow-[0_4px_20px_rgba(0,0,0,0.03)]";
+
+  return (
+    <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 animate-fade-in">
+      {/* Metric 1: Level & Rank */}
+      <div className={`p-5 rounded-3xl border flex flex-col justify-between transition-all hover:border-[#C2E7D3] ${statCardBg}`}>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280]">Player Rank</span>
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#124F34] to-[#10B981] flex items-center justify-center text-white shadow-md shadow-emerald-950/20">
+            <Trophy className="w-5 h-5" />
+          </div>
+        </div>
+        <div className="mt-2">
+          <h3 className={`font-display font-black text-2xl ${isDark ? 'text-white' : 'text-[#111827]'}`}>
+            Level {level}
+          </h3>
+          <p className="text-xs font-semibold text-[#124F34] truncate mt-0.5">
+            {rankTitle}
+          </p>
+        </div>
+        <div className="mt-3 pt-3 border-t border-[#EEF2F0]">
+          <div className="flex items-center justify-between text-[10px] font-mono mb-1 text-[#6B7280]">
+            <span>Progress to L{level + 1}</span>
+            <span className="font-bold text-[#124F34]">{xpInLvl}/500 XP</span>
+          </div>
+          <div className="h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-[#124F34] to-[#10B981] transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Metric 2: Discipline XP */}
+      <div className={`p-5 rounded-3xl border flex flex-col justify-between transition-all hover:border-[#C2E7D3] ${statCardBg}`}>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280]">Total Score</span>
+          <div className="w-10 h-10 rounded-2xl bg-[#E6F4ED] border border-[#C2E7D3] flex items-center justify-center text-[#124F34]">
+            <Zap className="w-5 h-5 fill-[#10B981] text-[#10B981]" />
+          </div>
+        </div>
+        <div className="mt-2">
+          <h3 className={`font-display font-black text-2xl ${isDark ? 'text-white' : 'text-[#111827]'}`}>
+            {safeUser.xp || 0} <span className="text-sm font-bold text-[#6B7280]">XP</span>
+          </h3>
+          <p className="text-xs text-[#6B7280] mt-0.5">
+            Accumulated Score
+          </p>
+        </div>
+        <div className="mt-3 pt-3 border-t border-[#EEF2F0] flex items-center justify-between">
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#E6F4ED] text-[#124F34] font-bold border border-[#C2E7D3] flex items-center gap-1">
+            <ArrowUpRight className="w-3 h-3 text-[#10B981]" /> +25 XP / task
+          </span>
+          <span className="text-[10px] font-mono text-[#6B7280]">Active</span>
+        </div>
+      </div>
+
+      {/* Metric 3: Active Streak */}
+      <div className={`p-5 rounded-3xl border flex flex-col justify-between transition-all hover:border-[#C2E7D3] ${statCardBg}`}>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280]">Discipline Streak</span>
+          <div className="w-10 h-10 rounded-2xl bg-[#FFF7ED] border border-[#FED7AA] flex items-center justify-center text-[#EA580C]">
+            <Flame className="w-5 h-5 fill-[#EA580C] animate-pulse" />
+          </div>
+        </div>
+        <div className="mt-2">
+          <h3 className={`font-display font-black text-2xl ${isDark ? 'text-white' : 'text-[#111827]'}`}>
+            {safeUser.streak || 0} <span className="text-sm font-bold text-[#6B7280]">Days</span>
+          </h3>
+          <p className="text-xs text-[#6B7280] mt-0.5">
+            Unbroken Daily Rhythm
+          </p>
+        </div>
+        <div className="mt-3 pt-3 border-t border-[#EEF2F0] flex items-center justify-between">
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FFF7ED] text-[#C2410C] font-bold border border-[#FED7AA] flex items-center gap-1">
+            <ShieldCheck className="w-3 h-3 text-[#EA580C]" /> Streak Active
+          </span>
+          <span className="text-[10px] font-mono text-[#6B7280]">x1.2 Multiplier</span>
+        </div>
+      </div>
+
+      {/* Metric 4: Coins Vault */}
+      <div className={`p-5 rounded-3xl border flex flex-col justify-between transition-all hover:border-[#C2E7D3] ${statCardBg}`}>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280]">Reward Vault</span>
+          <div className="w-10 h-10 rounded-2xl bg-[#FFFBEB] border border-[#FDE68A] flex items-center justify-center text-[#D97706]">
+            <Coins className="w-5 h-5" />
+          </div>
+        </div>
+        <div className="mt-2">
+          <h3 className={`font-display font-black text-2xl ${isDark ? 'text-white' : 'text-[#111827]'}`}>
+            {safeUser.coins || 0} <span className="text-sm font-bold text-[#6B7280]">Coins</span>
+          </h3>
+          <p className="text-xs text-[#6B7280] mt-0.5">
+            Available Balance
+          </p>
+        </div>
+        <div className="mt-3 pt-3 border-t border-[#EEF2F0] flex items-center justify-between">
+          <button
+            onClick={() => setActiveSidePanel('rewards')}
+            className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#FFFBEB] text-[#B45309] font-bold border border-[#FDE68A] flex items-center gap-1 hover:bg-[#FDE68A] transition-colors cursor-pointer"
+          >
+            <ShoppingBag className="w-3 h-3" /> Rewards Shop
+          </button>
+          <span className="text-[10px] font-mono text-[#6B7280]">Spend</span>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const DashboardGrid = () => {
+  const { user, isDark, activeModuleFilter = "All Modules", customModules = [], setActiveSidePanel } = useStore();
+
+  // Check if user is on the main Dashboard view ("All Modules")
+  const isMainDashboard = !activeModuleFilter || activeModuleFilter === "All Modules";
 
   const shouldShow = (categoryOrName) => {
     if (!activeModuleFilter || activeModuleFilter === "All Modules") return true;
@@ -171,122 +290,17 @@ export const DashboardGrid = () => {
     )
   );
 
-  const statCardBg = isDark
-    ? "bg-[#111e18] border-[#1a2f26]"
-    : "bg-white border-[#EEF2F0] shadow-[0_4px_20px_rgba(0,0,0,0.03)]";
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
 
-      {/* ── 1. Top-Row Equal-Width Stat Metric Cards ── */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        
-        {/* Metric 1: Level & Rank */}
-        <div className={`p-5 rounded-3xl border flex flex-col justify-between transition-all hover:border-[#C2E7D3] ${statCardBg}`}>
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280]">Player Rank</span>
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#124F34] to-[#10B981] flex items-center justify-center text-white shadow-md shadow-emerald-950/20">
-              <Trophy className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-2">
-            <h3 className={`font-display font-black text-2xl ${isDark ? 'text-white' : 'text-[#111827]'}`}>
-              Level {level}
-            </h3>
-            <p className="text-xs font-semibold text-[#124F34] truncate mt-0.5">
-              {rankTitle}
-            </p>
-          </div>
-          <div className="mt-3 pt-3 border-t border-[#EEF2F0]">
-            <div className="flex items-center justify-between text-[10px] font-mono mb-1 text-[#6B7280]">
-              <span>Progress to L{level + 1}</span>
-              <span className="font-bold text-[#124F34]">{xpInLvl}/500 XP</span>
-            </div>
-            <div className="h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-[#124F34] to-[#10B981] transition-all duration-500"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Metric 2: Discipline XP */}
-        <div className={`p-5 rounded-3xl border flex flex-col justify-between transition-all hover:border-[#C2E7D3] ${statCardBg}`}>
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280]">Total Score</span>
-            <div className="w-10 h-10 rounded-2xl bg-[#E6F4ED] border border-[#C2E7D3] flex items-center justify-center text-[#124F34]">
-              <Zap className="w-5 h-5 fill-[#10B981] text-[#10B981]" />
-            </div>
-          </div>
-          <div className="mt-2">
-            <h3 className={`font-display font-black text-2xl ${isDark ? 'text-white' : 'text-[#111827]'}`}>
-              {safeUser.xp || 0} <span className="text-sm font-bold text-[#6B7280]">XP</span>
-            </h3>
-            <p className="text-xs text-[#6B7280] mt-0.5">
-              Accumulated Score
-            </p>
-          </div>
-          <div className="mt-3 pt-3 border-t border-[#EEF2F0] flex items-center justify-between">
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#E6F4ED] text-[#124F34] font-bold border border-[#C2E7D3] flex items-center gap-1">
-              <ArrowUpRight className="w-3 h-3 text-[#10B981]" /> +25 XP / task
-            </span>
-            <span className="text-[10px] font-mono text-[#6B7280]">Active</span>
-          </div>
-        </div>
-
-        {/* Metric 3: Active Streak */}
-        <div className={`p-5 rounded-3xl border flex flex-col justify-between transition-all hover:border-[#C2E7D3] ${statCardBg}`}>
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280]">Discipline Streak</span>
-            <div className="w-10 h-10 rounded-2xl bg-[#FFF7ED] border border-[#FED7AA] flex items-center justify-center text-[#EA580C]">
-              <Flame className="w-5 h-5 fill-[#EA580C] animate-pulse" />
-            </div>
-          </div>
-          <div className="mt-2">
-            <h3 className={`font-display font-black text-2xl ${isDark ? 'text-white' : 'text-[#111827]'}`}>
-              {safeUser.streak || 0} <span className="text-sm font-bold text-[#6B7280]">Days</span>
-            </h3>
-            <p className="text-xs text-[#6B7280] mt-0.5">
-              Unbroken Daily Rhythm
-            </p>
-          </div>
-          <div className="mt-3 pt-3 border-t border-[#EEF2F0] flex items-center justify-between">
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FFF7ED] text-[#C2410C] font-bold border border-[#FED7AA] flex items-center gap-1">
-              <ShieldCheck className="w-3 h-3 text-[#EA580C]" /> Streak Active
-            </span>
-            <span className="text-[10px] font-mono text-[#6B7280]">x1.2 Multiplier</span>
-          </div>
-        </div>
-
-        {/* Metric 4: Coins Vault */}
-        <div className={`p-5 rounded-3xl border flex flex-col justify-between transition-all hover:border-[#C2E7D3] ${statCardBg}`}>
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280]">Reward Vault</span>
-            <div className="w-10 h-10 rounded-2xl bg-[#FFFBEB] border border-[#FDE68A] flex items-center justify-center text-[#D97706]">
-              <Coins className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-2">
-            <h3 className={`font-display font-black text-2xl ${isDark ? 'text-white' : 'text-[#111827]'}`}>
-              {safeUser.coins || 0} <span className="text-sm font-bold text-[#6B7280]">Coins</span>
-            </h3>
-            <p className="text-xs text-[#6B7280] mt-0.5">
-              Available Balance
-            </p>
-          </div>
-          <div className="mt-3 pt-3 border-t border-[#EEF2F0] flex items-center justify-between">
-            <button
-              onClick={() => setActiveSidePanel('rewards')}
-              className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#FFFBEB] text-[#B45309] font-bold border border-[#FDE68A] flex items-center gap-1 hover:bg-[#FDE68A] transition-colors cursor-pointer"
-            >
-              <ShoppingBag className="w-3 h-3" /> Rewards Shop
-            </button>
-            <span className="text-[10px] font-mono text-[#6B7280]">Spend</span>
-          </div>
-        </div>
-
-      </section>
+      {/* ── 1. Top-Row Equal-Width Stat Metric Cards (Rendered ONLY on Main Dashboard View) ── */}
+      {isMainDashboard && (
+        <TopSummaryStatsCards
+          user={user}
+          isDark={isDark}
+          setActiveSidePanel={setActiveSidePanel}
+        />
+      )}
 
       {/* ── 2. Unified Feature Modules ── */}
       <div className="space-y-8">
