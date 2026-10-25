@@ -55,14 +55,14 @@ function AppContent() {
   /* ── Phase 1: Loading spinner ── */
   if (initializing) {
     return (
-      <div className="min-h-screen bg-[#060910] flex items-center justify-center p-4">
-        <div className="text-center space-y-4">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 shadow-2xl shadow-indigo-500/30 mb-2 animate-pulse">
+      <div className="min-h-screen bg-[#F4F6F5] flex items-center justify-center p-4">
+        <div className="text-center space-y-4 bg-white p-8 rounded-3xl border border-[#EEF2F0] shadow-[0_4px_20px_rgba(0,0,0,0.03)] max-w-sm w-full">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#124F34] to-[#10B981] shadow-lg shadow-emerald-900/20 mb-2 animate-pulse">
             <Sparkles className="w-8 h-8 text-white" />
           </div>
-          <p className="font-display font-black text-white text-xl tracking-tight">LiFixify</p>
-          <div className="flex items-center justify-center gap-2 text-slate-400 text-sm">
-            <Loader2 className="w-4 h-4 animate-spin text-indigo-400" />
+          <p className="font-display font-black text-[#111827] text-2xl tracking-tight">LiFixify</p>
+          <div className="flex items-center justify-center gap-2 text-[#6B7280] text-sm">
+            <Loader2 className="w-4 h-4 animate-spin text-[#124F34]" />
             <span>Checking session...</span>
           </div>
         </div>
@@ -76,10 +76,10 @@ function AppContent() {
   }
 
   /* ── Phase 3: Authenticated app ── */
-  const mainBg = isDark ? "bg-[#080c14] text-slate-100" : "bg-slate-100 text-slate-900";
+  const mainBg = isDark ? "bg-[#0b1310] text-slate-100" : "bg-[#F4F6F5] text-[#111827]";
 
   return (
-    <div className={`min-h-screen ${mainBg} flex font-sans selection:bg-indigo-500 selection:text-white relative`}>
+    <div className={`min-h-screen ${mainBg} flex font-sans selection:bg-[#124F34] selection:text-white relative`}>
 
       {/* ── Left Sidebar (desktop) ── */}
       <ErrorBoundary>
@@ -107,7 +107,7 @@ function AppContent() {
                 <div className="mb-4">
                   <button
                     onClick={() => useStore.getState().setActiveSidePanel(null)}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-[#124F34] bg-white hover:bg-[#E6F4ED] border border-[#EEF2F0] shadow-sm transition-all cursor-pointer"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
                   </button>
@@ -120,7 +120,7 @@ function AppContent() {
                 <div className="mb-4">
                   <button
                     onClick={() => useStore.getState().setActiveSidePanel(null)}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-[#124F34] bg-white hover:bg-[#E6F4ED] border border-[#EEF2F0] shadow-sm transition-all cursor-pointer"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
                   </button>
@@ -166,7 +166,7 @@ function AppContent() {
         )}
 
         {/* Footer */}
-        <footer className={`border-t py-4 px-4 text-center text-xs text-slate-500 ${isDark ? "border-slate-800/60 bg-[#060910]" : "border-slate-200 bg-white"}`}>
+        <footer className={`border-t py-4 px-4 text-center text-xs text-[#6B7280] ${isDark ? "border-slate-800/60 bg-[#09100d]" : "border-[#EEF2F0] bg-white"}`}>
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <p className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />

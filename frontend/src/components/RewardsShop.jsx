@@ -23,9 +23,9 @@ export const RewardsShop = () => {
   const [cost,        setCost]        = useState(100);
   const [category,    setCategory]    = useState('Leisure');
 
-  const cardBg  = isDark ? 'bg-[#090d16] border-slate-800/80' : 'bg-white border-slate-200';
-  const textSub = isDark ? 'text-slate-400' : 'text-slate-500';
-  const inputCls = isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900';
+  const cardBg  = isDark ? 'bg-[#111e18] border-[#1a2f26]' : 'bg-white border-[#EEF2F0] shadow-[0_4px_20px_rgba(0,0,0,0.03)]';
+  const textSub = isDark ? 'text-slate-400' : 'text-[#6B7280]';
+  const inputCls = isDark ? 'bg-[#14261f] border-[#1a2f26] text-white' : 'bg-[#F4F6F5] border-[#EEF2F0] text-[#111827] focus:border-[#124F34]';
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -87,7 +87,7 @@ export const RewardsShop = () => {
           </div>
           <div className="flex justify-end gap-2 pt-1">
             <button type="button" onClick={() => setIsAdding(false)} className={`px-4 py-2 text-xs font-semibold ${textSub} cursor-pointer`}>Cancel</button>
-            <button type="submit" className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow cursor-pointer">Add Perk</button>
+            <button type="submit" className="px-4 py-2 rounded-xl bg-[#124F34] hover:bg-[#0D5C3A] text-white shadow-md shadow-emerald-950/20 text-xs font-black shadow cursor-pointer">Add Perk</button>
           </div>
         </form>
       )}

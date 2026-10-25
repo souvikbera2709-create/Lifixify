@@ -4,29 +4,81 @@
 
 @layer base {
   body {
-    background-color: #080c14;
-    color: #e2e8f0;
+    background-color: #F4F6F5;
+    color: #111827;
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   }
 }
 
+/* Light Emerald Modern Aesthetics */
 .glass-panel-glow {
-  background: rgba(17, 24, 39, 0.85);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: #FFFFFF;
+  border: 1px solid #EEF2F0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
 }
 
 .glass-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%), #0d1322;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: #FFFFFF;
+  border: 1px solid #EEF2F0;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
-  border-color: rgba(139, 92, 246, 0.4);
+  border-color: #C2E7D3;
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.4), 0 0 20px -3px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 8px 30px rgba(18, 79, 52, 0.08);
+}
+
+/* Dark mode fallback if toggled */
+.dark body {
+  background-color: #0b1310;
+  color: #e5e7eb;
+}
+
+.dark .glass-card {
+  background: #111e18;
+  border-color: #1a2f26;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dark .glass-card:hover {
+  border-color: #2e5946;
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.1);
+}
+
+/* Primary emerald button utility */
+.btn-emerald {
+  background-color: #124F34;
+  color: #FFFFFF;
+  transition: all 0.2s ease-in-out;
+}
+.btn-emerald:hover {
+  background-color: #0D5C3A;
+}
+
+/* Mint badge utility */
+.badge-mint {
+  background-color: #E6F4ED;
+  color: #124F34;
+  border: 1px solid #C2E7D3;
+}
+
+/* Custom smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
 }
 
 @keyframes shimmer {

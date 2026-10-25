@@ -248,19 +248,19 @@ export const FitnessNutritionHub = () => {
   };
 
   // ── Styles ────────────────────────────────────────────────────
-  const cardBg  = isDark ? 'bg-[#090d16] border-slate-800/80' : 'bg-white border-slate-200';
-  const textSub = isDark ? 'text-slate-400' : 'text-slate-500';
-  const inputCls = isDark ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-600' : 'bg-slate-50 border-slate-300 text-slate-900';
-  const tabBase  = 'px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer';
-  const tabActive = 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow';
-  const tabIdle   = isDark ? 'text-slate-400 hover:bg-slate-800' : 'text-slate-500 hover:bg-slate-100';
+  const cardBg  = isDark ? 'bg-[#111e18] border-[#1a2f26]' : 'bg-white border-[#EEF2F0] shadow-[0_4px_20px_rgba(0,0,0,0.03)]';
+  const textSub = isDark ? 'text-slate-400' : 'text-[#6B7280]';
+  const inputCls = isDark ? 'bg-[#14261f] border-[#1a2f26] text-white placeholder-slate-500' : 'bg-[#F4F6F5] border-[#EEF2F0] text-[#111827] focus:border-[#124F34]';
+  const tabBase  = 'px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer';
+  const tabActive = 'bg-[#124F34] text-white shadow-md shadow-emerald-950/20';
+  const tabIdle   = isDark ? 'text-slate-400 hover:bg-[#1a2f26]' : 'text-[#6B7280] hover:bg-[#E6F4ED] hover:text-[#124F34]';
 
   const NeedConfig = () => (
     <div className={`p-6 rounded-2xl ${cardBg} border border-dashed border-slate-600 text-center space-y-3`}>
       <Settings className={`w-8 h-8 mx-auto ${textSub}`} />
       <p className={`font-bold text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>No targets set yet</p>
       <p className={`text-xs ${textSub}`}>Click "Edit Targets" to configure your daily goals before logging.</p>
-      <button onClick={() => { setDraftTargets(targets); setEditTargets(true); }} className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold cursor-pointer">Set My Targets</button>
+      <button onClick={() => { setDraftTargets(targets); setEditTargets(true); }} className="px-4 py-2 rounded-xl bg-[#124F34] hover:bg-[#0D5C3A] text-white text-xs font-bold cursor-pointer">Set My Targets</button>
     </div>
   );
 
@@ -291,8 +291,8 @@ export const FitnessNutritionHub = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
-            <Dumbbell className="w-5 h-5 text-cyan-400" />
+          <div className="w-10 h-10 rounded-2xl bg-[#E6F4ED] border border-[#C2E7D3] flex items-center justify-center">
+            <Dumbbell className="w-5 h-5 text-[#124F34]" />
           </div>
           <div>
             <h2 className={`font-display font-black text-xl ${isDark ? 'text-white' : 'text-slate-900'}`}>Fitness & Nutrition</h2>
@@ -308,9 +308,9 @@ export const FitnessNutritionHub = () => {
       </div>
 
       {/* Reward notice */}
-      <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-950/30 border border-amber-700/30 text-amber-300 text-xs font-medium`}>
-        <Gift className="w-4 h-4 text-amber-400 shrink-0" />
-        Complete 100% of a daily goal to earn <strong className="text-amber-400 ml-1">+50 XP & +15 Coins</strong>. Partial progress earns no XP.
+      <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#E6F4ED] border border-[#C2E7D3] text-[#124F34] text-xs font-medium`}>
+        <Gift className="w-4 h-4 text-[#10B981] shrink-0" />
+        Complete 100% of a daily goal to earn <strong className="text-[#124F34] font-black ml-1">+50 XP & +15 Coins</strong>. Partial progress earns no XP.
       </div>
 
       {/* Tabs */}
@@ -329,7 +329,7 @@ export const FitnessNutritionHub = () => {
           {/* Add workout form */}
           <form onSubmit={handleAddWorkout} className={`p-4 rounded-2xl ${cardBg} border space-y-3`}>
             <div className="flex items-center gap-2">
-              <Dumbbell className="w-4 h-4 text-cyan-400 shrink-0" />
+              <Dumbbell className="w-4 h-4 text-[#124F34] shrink-0" />
               <span className={`text-xs font-bold ${isDark ? "text-slate-300" : "text-slate-700"}`}>Log Exercise</span>
               <button
                 type="button"
@@ -394,7 +394,7 @@ export const FitnessNutritionHub = () => {
 
             <button
               type="submit"
-              className="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+              className="w-full py-2.5 rounded-xl bg-[#124F34] hover:bg-[#0D5C3A] text-white font-bold text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-4 h-4" />+ Log Exercise
             </button>
@@ -410,7 +410,7 @@ export const FitnessNutritionHub = () => {
               return (
                 <div key={i} className={`p-3.5 rounded-2xl ${cardBg} border flex items-center justify-between gap-3 hover:border-cyan-500/40 transition-colors`}>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-xs border border-cyan-500/20">#{i + 1}</div>
+                    <div className="w-8 h-8 rounded-xl bg-cyan-500/10 text-[#124F34] flex items-center justify-center font-bold text-xs border border-cyan-500/20">#{i + 1}</div>
                     <div>
                       <h4 className={`font-display font-bold text-sm ${isDark ? "text-white" : "text-slate-900"}`}>{displayName}</h4>
                       <p className="text-xs text-slate-400 font-mono mt-0.5">{w.sets} Sets &times; {w.reps} Reps @ <strong className="text-cyan-300">{w.weight} kg</strong></p>
@@ -449,7 +449,7 @@ export const FitnessNutritionHub = () => {
           {/* Quick Meal Logger */}
           <form onSubmit={handleAddMeal} className={`p-4 rounded-2xl ${cardBg} border space-y-3`}>
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-cyan-400" />
+              <TrendingUp className="w-4 h-4 text-[#124F34]" />
               <span className={`text-xs font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Log a Meal</span>
               <span className={`text-[10px] ml-auto ${textSub}`}>No XP until daily goal reached</span>
             </div>
@@ -467,7 +467,7 @@ export const FitnessNutritionHub = () => {
                 </div>
               ))}
             </div>
-            <button type="submit" className="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+            <button type="submit" className="w-full py-2.5 rounded-xl bg-[#124F34] hover:bg-[#0D5C3A] text-white font-bold text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
               <Plus className="w-4 h-4" />Add to Today's Log
             </button>
           </form>
@@ -497,7 +497,7 @@ export const FitnessNutritionHub = () => {
                 <button
                   key={ml}
                   onClick={() => handleDrinkWater(ml)}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#124F34] hover:bg-[#0D5C3A] text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
                 >
                   <Droplet className="w-3.5 h-3.5" />+{ml}ml
                 </button>
@@ -520,7 +520,7 @@ export const FitnessNutritionHub = () => {
             {/* Header */}
             <div className={`flex items-center justify-between pb-3 border-b ${isDark ? 'border-slate-800' : 'border-slate-200'} mb-4`}>
               <h3 className={`font-bold text-base flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                <Dumbbell className="w-4 h-4 text-cyan-400" />Exercise Manager
+                <Dumbbell className="w-4 h-4 text-[#124F34]" />Exercise Manager
               </h3>
               <button onClick={() => setShowManageEx(false)} className={`${textSub} cursor-pointer`}><X className="w-5 h-5" /></button>
             </div>
@@ -550,7 +550,7 @@ export const FitnessNutritionHub = () => {
               <button
                 type="submit"
                 disabled={exSaving || !newExName.trim()}
-                className="w-full py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white font-bold text-xs shadow transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full py-2 rounded-xl bg-[#124F34] hover:bg-[#0D5C3A] disabled:opacity-50 text-white font-bold text-xs shadow transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 {exSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
                 {exSaving ? 'Saving...' : 'Add Exercise'}
@@ -565,7 +565,7 @@ export const FitnessNutritionHub = () => {
             <div className="overflow-y-auto flex-1 space-y-1.5 pr-1">
               {exLoading && (
                 <div className="flex items-center justify-center py-6">
-                  <Loader2 className="w-5 h-5 animate-spin text-cyan-400" />
+                  <Loader2 className="w-5 h-5 animate-spin text-[#124F34]" />
                 </div>
               )}
               {!exLoading && customExercises.length === 0 && (
@@ -594,7 +594,7 @@ export const FitnessNutritionHub = () => {
             {/* Preset hint */}
             <div className={`mt-4 pt-3 border-t ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
               <p className={`text-[10px] ${textSub}`}>
-                <strong className="text-cyan-400">{PRESET_EXERCISES.length} built-in presets</strong> + {customExercises.length} custom exercises are available in your Log Exercise dropdown.
+                <strong className="text-[#124F34]">{PRESET_EXERCISES.length} built-in presets</strong> + {customExercises.length} custom exercises are available in your Log Exercise dropdown.
               </p>
             </div>
           </div>
@@ -633,7 +633,7 @@ export const FitnessNutritionHub = () => {
               ))}
               <div className="flex justify-end gap-2 pt-2">
                 <button type="button" onClick={() => setEditTargets(false)} className={`px-4 py-2 text-xs font-semibold ${textSub} cursor-pointer`}>Cancel</button>
-                <button type="submit" className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black shadow cursor-pointer">Save Targets</button>
+                <button type="submit" className="px-4 py-2 rounded-xl bg-[#124F34] hover:bg-[#0D5C3A] text-white text-xs font-black shadow cursor-pointer">Save Targets</button>
               </div>
             </form>
           </div>

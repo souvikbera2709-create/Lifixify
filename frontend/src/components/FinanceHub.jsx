@@ -40,7 +40,7 @@ const CATEGORY_COLORS = {
 const CHART_COLORS = ['#10b981', '#f59e0b', '#ec4899', '#6366f1', '#06b6d4', '#ef4444', '#8b5cf6'];
 
 export const FinanceHub = () => {
-  const { addXp, addCoins } = useStore();
+  const { addXp, addCoins, isDark } = useStore();
   const [transactions, setTransactions] = useState([]);
   const [summary, setSummary] = useState({
     totalIncome: 5000,
@@ -150,22 +150,23 @@ export const FinanceHub = () => {
   }
 
   return (
-    <div className="glass-card rounded-3xl p-6 border-t-2 border-t-amber-500 shadow-xl">
+    <div className={`rounded-3xl p-6 border transition-all ${isDark ? "bg-[#111e18] border-[#1a2f26]" : "bg-white border-[#EEF2F0] shadow-[0_4px_20px_rgba(0,0,0,0.03)]"}`}>
+
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[#EEF2F0]">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md shadow-amber-500/20">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#124F34] to-[#10B981] flex items-center justify-center text-white shadow-md shadow-emerald-950/20">
             <Wallet className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="font-display font-bold text-xl text-white flex items-center gap-2">
+            <h2 className={`font-display font-black text-xl flex items-center gap-2 ${isDark ? "text-white" : "text-[#111827]"}`}>
               Finance Tracking Hub
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E6F4ED] text-[#124F34] border border-[#C2E7D3]">
                 Wealth Warden
               </span>
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#6B7280]">
               Categorized ledger and Recharts visual budgeting breakdown
             </p>
           </div>
@@ -173,10 +174,10 @@ export const FinanceHub = () => {
 
         {/* Aggregate Badges */}
         <div className="flex items-center gap-2 text-xs font-mono font-bold">
-          <span className="px-3 py-1.5 rounded-xl bg-emerald-950/40 text-emerald-400 border border-emerald-500/30">
+          <span className="px-3 py-1.5 rounded-xl bg-[#E6F4ED] text-[#124F34] border border-[#C2E7D3]">
             Income: ₹{summary.totalIncome.toLocaleString()}
           </span>
-          <span className="px-3 py-1.5 rounded-xl bg-rose-950/40 text-rose-400 border border-rose-500/30">
+          <span className="px-3 py-1.5 rounded-xl bg-[#FEF2F2] text-[#991B1B] border border-[#FECACA]">
             Expenses: ₹{summary.totalExpenses.toLocaleString()}
           </span>
         </div>
@@ -188,7 +189,7 @@ export const FinanceHub = () => {
         {/* Left: Net Balance Card & Add Form */}
         <div className="space-y-4">
           <div className="p-5 rounded-2xl bg-[#090d16] border border-amber-900/30">
-            <span className="text-xs text-slate-400 font-medium block">Net Savings Balance</span>
+            <span className="text-xs text-[#6B7280] font-medium block">Net Savings Balance</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="font-mono text-3xl font-extrabold text-white">
                 ₹{summary.netSavings.toLocaleString()}

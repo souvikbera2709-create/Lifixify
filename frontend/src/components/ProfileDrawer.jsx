@@ -34,10 +34,10 @@ export const ProfileDrawer = ({ onClose }) => {
   const pct = Math.min(100, (lvlXp / 500) * 100);
 
   const bg = isDark ? 'bg-[#0b0f1c]' : 'bg-white';
-  const border = isDark ? 'border-slate-700/50' : 'border-slate-200';
+  const border = isDark ? 'border-[#1a2f26]' : 'border-[#EEF2F0]';
   const tp = isDark ? 'text-white' : 'text-slate-900';
   const tm = isDark ? 'text-slate-400' : 'text-slate-500';
-  const sec = isDark ? 'bg-slate-900/50' : 'bg-slate-50';
+  const sec = isDark ? 'bg-[#14261f]' : 'bg-[#F9FCFA]';
 
   const handleSaveName = () => { if (nameInput.trim()) updateUserLocal({ name: nameInput.trim() }); setEditingName(false); };
   const handleAvatarSelect = (e) => { setSelectedAvatar(e); updateUserLocal({ avatar: e }); };

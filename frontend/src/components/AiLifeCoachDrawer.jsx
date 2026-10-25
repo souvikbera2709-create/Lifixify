@@ -77,7 +77,7 @@ export const AiLifeCoachDrawer = () => {
       {/* Floating Action Button */}
       <button
         onClick={toggleAiDrawer}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs shadow-2xl shadow-purple-600/50 border border-purple-400/40 transition-all hover:scale-105 active:scale-95 cursor-pointer group"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-[#124F34] via-[#0D5C3A] to-[#10B981] hover:from-[#0D5C3A] hover:to-[#0B3A26] text-white font-bold text-xs shadow-xl shadow-emerald-950/25 border border-[#C2E7D3]/40 transition-all hover:scale-105 active:scale-95 cursor-pointer group"
       >
         <Sparkles className="w-5 h-5 text-amber-300 animate-spin-slow group-hover:rotate-12 transition-transform" />
         <span className="font-display font-bold tracking-wide">Ask Life Coach Lumina</span>
@@ -87,10 +87,10 @@ export const AiLifeCoachDrawer = () => {
       {/* Slide-out Drawer */}
       {isAiDrawerOpen && (
         <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-md h-full bg-[#0d1322] border-l border-purple-500/30 flex flex-col shadow-2xl animate-slide-left">
+          <div className={`w-full max-w-md h-full flex flex-col shadow-2xl animate-slide-left border-l ${isDark ? "bg-[#111e18] border-[#1a2f26]" : "bg-white border-[#EEF2F0]"}`}>
             
             {/* Drawer Header */}
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-[#0a0f1c]">
+            <div className={`p-4 border-b flex items-center justify-between ${isDark ? "border-[#1a2f26] bg-[#0f1d16]" : "border-[#EEF2F0] bg-[#F9FCFA]"}`}>
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-purple-500/30">
                   <Bot className="w-5 h-5" />

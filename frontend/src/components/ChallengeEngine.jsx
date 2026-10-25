@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 export const ChallengeEngine = () => {
-  const { addXp, addCoins } = useStore();
+  const { addXp, addCoins, isDark } = useStore();
   const [challenges, setChallenges] = useState([]);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
   const [selectedDayNumber, setSelectedDayNumber] = useState(1);
@@ -210,22 +210,23 @@ export const ChallengeEngine = () => {
     : 0;
 
   return (
-    <div className="glass-card rounded-3xl p-6 border-t-2 border-t-purple-500 shadow-xl">
+    <div className={`rounded-3xl p-6 border transition-all ${isDark ? "bg-[#111e18] border-[#1a2f26]" : "bg-white border-[#EEF2F0] shadow-[0_4px_20px_rgba(0,0,0,0.03)]"}`}>
+
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[#EEF2F0]">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-purple-500/20">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#124F34] to-[#10B981] flex items-center justify-center text-white shadow-md shadow-emerald-950/20">
             <Trophy className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="font-display font-bold text-xl text-white flex items-center gap-2">
+            <h2 className={`font-display font-black text-xl flex items-center gap-2 ${isDark ? "text-white" : "text-[#111827]"}`}>
               Multi-Day Challenge Engine
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E6F4ED] text-[#124F34] border border-[#C2E7D3]">
                 Advance Planning
               </span>
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#6B7280]">
               Create arbitrary-length campaigns (7, 30, 75 days) and plan daily quests in advance
             </p>
           </div>
@@ -233,7 +234,7 @@ export const ChallengeEngine = () => {
 
         <button
           onClick={() => setIsCreating(!isCreating)}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#124F34] hover:bg-[#0D5C3A] text-white text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>{isCreating ? 'Close Form' : 'New Challenge'}</span>
@@ -382,7 +383,7 @@ export const ChallengeEngine = () => {
                   <h3 className="font-display font-bold text-lg text-white">
                     {selectedChallenge.title}
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-[#6B7280]">
                     Category: <span className="text-purple-400 capitalize">{selectedChallenge.category}</span> &bull; {selectedChallenge.totalDays} Total Days
                   </p>
                 </div>
@@ -474,7 +475,7 @@ export const ChallengeEngine = () => {
               />
               <button
                 type="submit"
-                className="px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold whitespace-nowrap active:scale-95 transition-all shadow"
+                className="px-3 py-2 rounded-xl bg-[#124F34] hover:bg-[#0D5C3A] text-white text-xs font-bold whitespace-nowrap active:scale-95 transition-all shadow"
               >
                 + Plan Quest
               </button>

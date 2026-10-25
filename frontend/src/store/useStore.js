@@ -55,7 +55,7 @@ export const useStore = create((set, get) => ({
   isAuthenticated: false,
 
   // Theme
-  isDark: true,
+  isDark: false,
   toggleTheme: () => set(s => {
     const next = !s.isDark;
     if (typeof document !== "undefined") {

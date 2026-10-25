@@ -6,11 +6,11 @@ import {
 } from 'lucide-react';
 
 const CORE_MODULES = [
-  { id: 'all',     name: 'All Modules',      icon: LayoutDashboard },
-  { id: 'daily',   name: 'Daily Life',        icon: Sparkles },
-  { id: 'study',   name: 'Study & Focus',     icon: BookOpen },
-  { id: 'fitness', name: 'Fitness & Nutrition', icon: Activity },
-  { id: 'finance', name: 'Finance Tracking',  icon: Wallet },
+  { id: 'all',     name: 'All Modules',        icon: LayoutDashboard },
+  { id: 'daily',   name: 'Daily Life',          icon: Sparkles },
+  { id: 'study',   name: 'Study & Focus',       icon: BookOpen },
+  { id: 'fitness', name: 'Fitness & Nutrition',  icon: Activity },
+  { id: 'finance', name: 'Finance Tracking',    icon: Wallet },
 ];
 
 export const Navbar = () => {
@@ -22,18 +22,18 @@ export const Navbar = () => {
   const handleAddModule = (e) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
-    addCustomModule({ title: newTitle.trim(), category: newCategory, description: 'Custom user module', accentColor: '#8b5cf6' });
+    addCustomModule({ title: newTitle.trim(), category: newCategory, description: 'Custom user module', accentColor: '#124F34' });
     setNewTitle('');
     setIsModalOpen(false);
   };
 
-  const navBg   = isDark ? 'bg-[#0d1322]/80 border-slate-800/80' : 'bg-white/80 border-slate-200/80';
-  const inputCls = isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900';
+  const navBg = isDark ? 'bg-[#111e18]/90 border-[#1a2f26]' : 'bg-white/90 border-[#EEF2F0]';
+  const inputCls = isDark ? 'bg-[#14261f] border-[#1a2f26] text-white' : 'bg-[#F4F6F5] border-[#EEF2F0] text-[#111827] focus:border-[#124F34]';
 
   return (
     <>
-      <nav className={`w-full ${navBg} border-b px-4 sm:px-6 py-2.5 backdrop-blur-md`}>
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+      <nav className={`w-full ${navBg} border-b px-4 sm:px-6 py-2.5 backdrop-blur-md sticky top-0 z-20 shadow-[0_2px_10px_rgba(0,0,0,0.02)]`}>
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
           {(CORE_MODULES || []).map(m => {
             const Icon = m.icon;
             const isActive = activeModuleFilter === m.name;
@@ -41,13 +41,15 @@ export const Navbar = () => {
               <button
                 key={m.id}
                 onClick={() => setActiveModuleFilter(m.name)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                   isActive
-                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/25 ring-1 ring-indigo-400'
-                    : isDark ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                    ? 'bg-[#124F34] text-white shadow-md shadow-emerald-950/20 ring-1 ring-[#124F34]'
+                    : isDark
+                      ? 'text-slate-400 hover:text-white hover:bg-[#1a2f26]'
+                      : 'text-[#6B7280] hover:text-[#124F34] hover:bg-[#E6F4ED]'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : isDark ? 'text-slate-500' : 'text-slate-400'}`} />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-current'}`} />
                 {m.name}
               </button>
             );
@@ -59,22 +61,24 @@ export const Navbar = () => {
               <button
                 key={cm.id}
                 onClick={() => setActiveModuleFilter(cm.title)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border shrink-0 ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer border shrink-0 ${
                   isActive
-                    ? 'bg-slate-800 text-pink-300 border-pink-500/50 shadow-md ring-1 ring-pink-400'
-                    : isDark ? 'border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800/40' : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                    ? 'bg-[#124F34] text-white border-[#124F34] shadow-md'
+                    : isDark
+                      ? 'border-[#1a2f26] text-slate-400 hover:text-white hover:bg-[#1a2f26]'
+                      : 'border-[#EEF2F0] text-[#6B7280] hover:text-[#124F34] hover:bg-[#E6F4ED]'
                 }`}
               >
-                <span className="w-2 h-2 rounded-full bg-pink-400 shrink-0" />
+                <span className="w-2 h-2 rounded-full bg-[#10B981] shrink-0" />
                 {cm.title}
               </button>
             );
           })}
 
-          {/* Add Module */}
+          {/* Add Module Button */}
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white text-xs font-bold shadow-md shadow-indigo-500/25 transition-all cursor-pointer active:scale-95 shrink-0 ml-1"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-[#E6F4ED] hover:bg-[#C2E7D3] text-[#124F34] border border-[#C2E7D3] text-xs font-bold shadow-sm transition-all cursor-pointer active:scale-95 shrink-0 ml-1"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Module
@@ -84,20 +88,38 @@ export const Navbar = () => {
 
       {/* Add Module Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className={`w-full max-w-md ${isDark ? 'bg-[#0d1322] border-indigo-500/30' : 'bg-white border-indigo-300/50'} border rounded-3xl p-6 shadow-2xl`}>
-            <div className={`flex items-center justify-between pb-3 border-b ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
-              <h3 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>Add Workspace Module</h3>
-              <button onClick={() => setIsModalOpen(false)} className={`${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'} cursor-pointer`}><X className="w-5 h-5" /></button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className={`w-full max-w-md ${isDark ? 'bg-[#111e18] border-[#1a2f26]' : 'bg-white border-[#EEF2F0]'} border rounded-3xl p-6 shadow-2xl animate-fade-in`}>
+            <div className={`flex items-center justify-between pb-3 border-b ${isDark ? 'border-[#1a2f26]' : 'border-[#EEF2F0]'}`}>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-[#E6F4ED] flex items-center justify-center text-[#124F34]">
+                  <Plus className="w-4 h-4" />
+                </div>
+                <h3 className={`font-bold text-base ${isDark ? 'text-white' : 'text-[#111827]'}`}>Create Workspace Module</h3>
+              </div>
+              <button onClick={() => setIsModalOpen(false)} className="text-[#6B7280] hover:text-[#111827] cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
             </div>
             <form onSubmit={handleAddModule} className="space-y-4 mt-4">
               <div>
-                <label className={`block text-xs font-semibold mb-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Module Name</label>
-                <input type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="e.g. Japanese Kanji Practice" required className={`w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none focus:border-indigo-500 ${inputCls}`} />
+                <label className={`block text-xs font-bold mb-1.5 ${isDark ? 'text-slate-300' : 'text-[#111827]'}`}>Module Name</label>
+                <input
+                  type="text"
+                  value={newTitle}
+                  onChange={e => setNewTitle(e.target.value)}
+                  placeholder="e.g. Daily Spanish Practice"
+                  required
+                  className={`w-full px-3.5 py-2.5 rounded-2xl border text-sm outline-none transition-all ${inputCls}`}
+                />
               </div>
               <div>
-                <label className={`block text-xs font-semibold mb-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Category</label>
-                <select value={newCategory} onChange={e => setNewCategory(e.target.value)} className={`w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none ${inputCls}`}>
+                <label className={`block text-xs font-bold mb-1.5 ${isDark ? 'text-slate-300' : 'text-[#111827]'}`}>Category</label>
+                <select
+                  value={newCategory}
+                  onChange={e => setNewCategory(e.target.value)}
+                  className={`w-full px-3.5 py-2.5 rounded-2xl border text-sm outline-none ${inputCls}`}
+                >
                   <option value="Daily Life">Daily Life</option>
                   <option value="Study & Focus">Study & Focus</option>
                   <option value="Fitness & Nutrition">Fitness & Nutrition</option>
@@ -105,8 +127,19 @@ export const Navbar = () => {
                 </select>
               </div>
               <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setIsModalOpen(false)} className={`px-4 py-2 text-xs font-semibold ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'} cursor-pointer`}>Cancel</button>
-                <button type="submit" className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow cursor-pointer">Create Module</button>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 text-xs font-bold text-[#6B7280] hover:text-[#111827] cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2.5 rounded-2xl bg-[#124F34] hover:bg-[#0D5C3A] text-white text-xs font-bold shadow-md shadow-emerald-950/20 cursor-pointer transition-all"
+                >
+                  Create Module
+                </button>
               </div>
             </form>
           </div>

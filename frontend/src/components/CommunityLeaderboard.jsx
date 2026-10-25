@@ -37,8 +37,8 @@ export const CommunityLeaderboard = () => {
 
   useEffect(() => { fetchLeaderboard(); }, []);
 
-  const cardBg  = isDark ? 'bg-[#090d16] border-slate-800/80' : 'bg-white border-slate-200';
-  const textSub = isDark ? 'text-slate-400' : 'text-slate-500';
+  const cardBg  = isDark ? 'bg-[#111e18] border-[#1a2f26]' : 'bg-white border-[#EEF2F0] shadow-[0_4px_20px_rgba(0,0,0,0.03)]';
+  const textSub = isDark ? 'text-slate-400' : 'text-[#6B7280]';
 
   const MEDALS = [
     { label: '1st', grad: 'from-amber-500 to-yellow-300',   border: 'border-amber-400',  text: 'text-amber-400'  },
