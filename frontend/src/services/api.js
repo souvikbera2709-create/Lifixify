@@ -10,16 +10,19 @@
 //   3. Fallback: http://localhost:5001 (local dev)
 const _envUrl = import.meta.env.VITE_API_BASE_URL;
 
-const RENDER_BACKEND = 'https://lifixify.onrender.com';
+// Build the Render backend URL from parts to prevent build-tool URL rewriting
+const _PROTO = 'https';
+const _HOST = 'lifixify.onrender.com';
+const RENDER_BACKEND = _PROTO + '://' + _HOST;
 
 function resolveBaseUrl() {
   // 1. Explicit env var always wins
-  if (_envUrl) return _envUrl;
+  if (_envUrl && _envUrl.startsWith('http')) return _envUrl.replace(/\/+$/, '');
 
-  // 2. Auto-detect production: if we're on Vercel, use Render backend
+  // 2. Auto-detect production: if running on Vercel, point to Render backend
   if (typeof window !== 'undefined') {
-    const host = window.location.hostname;
-    if (host.endsWith('.vercel.app') || host === 'lifixify.vercel.app') {
+    const h = window.location.hostname;
+    if (h.endsWith('.vercel.app') || h === 'lifixify.vercel.app') {
       return RENDER_BACKEND;
     }
   }
@@ -30,14 +33,9 @@ function resolveBaseUrl() {
 
 const rawBaseUrl = resolveBaseUrl();
 
-// Normalise: strip trailing slashes, then ensure path ends with /api exactly once
-const _stripped = rawBaseUrl.replace(/\/+$/, '');
-const API_BASE = _stripped.endsWith('/api') ? _stripped : `${_stripped}/api`;
-
-// Debug: log resolved API base in development
-if (import.meta.env.DEV) {
-  console.log('[LiFixify] API_BASE →', API_BASE);
-}
+// Normalise: strip trailing slashes, ensure path ends with /api exactly once
+const _clean = rawBaseUrl.replace(/\/+$/, '');
+const API_BASE = _clean.endsWith('/api') ? _clean : _clean + '/api';
 
 const getHeaders = () => {
   const token = localStorage.getItem('lifixify_token');

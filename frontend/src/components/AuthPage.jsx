@@ -45,9 +45,7 @@ export const AuthPage = () => {
         const isProd = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
         if (isProd) {
           setError(
-            'Unable to connect to the server. ' +
-            'Make sure VITE_API_BASE_URL is set in your Vercel Environment Variables ' +
-            '(e.g. https://lifixify.onrender.com).'
+            'Unable to connect to the server. The backend may be starting up — please try again in 30 seconds.'
           );
         } else {
           setError('Unable to connect to server. Please ensure the backend is running on port 5001.');
