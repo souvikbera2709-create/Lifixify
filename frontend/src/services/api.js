@@ -4,24 +4,40 @@
  */
 
 // ── API Base URL ─────────────────────────────────────────────────────
-// In development: reads from frontend/.env (VITE_API_BASE_URL=http://localhost:5001)
-// In production:  MUST be set in Vercel dashboard → Settings → Environment Variables
-//                 e.g. VITE_API_BASE_URL = https://lifixify.onrender.com
+// Priority:
+//   1. VITE_API_BASE_URL env var (set in .env / .env.production / Vercel dashboard)
+//   2. Auto-detect: if running on a Vercel deploy (*.vercel.app), use the Render backend
+//   3. Fallback: http://localhost:5001 (local dev)
 const _envUrl = import.meta.env.VITE_API_BASE_URL;
 
-if (!_envUrl && import.meta.env.PROD) {
-  console.error(
-    '[LiFixify] ⚠️  VITE_API_BASE_URL is not set!\n' +
-    'Go to Vercel Dashboard → Project Settings → Environment Variables\n' +
-    'and add:  VITE_API_BASE_URL = https://lifixify.onrender.com'
-  );
+const RENDER_BACKEND = 'https://lifixify.onrender.com';
+
+function resolveBaseUrl() {
+  // 1. Explicit env var always wins
+  if (_envUrl) return _envUrl;
+
+  // 2. Auto-detect production: if we're on Vercel, use Render backend
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host.endsWith('.vercel.app') || host === 'lifixify.vercel.app') {
+      return RENDER_BACKEND;
+    }
+  }
+
+  // 3. Local development fallback
+  return 'http://localhost:5001';
 }
 
-const rawBaseUrl = _envUrl || 'http://localhost:5001';
+const rawBaseUrl = resolveBaseUrl();
 
 // Normalise: strip trailing slashes, then ensure path ends with /api exactly once
 const _stripped = rawBaseUrl.replace(/\/+$/, '');
 const API_BASE = _stripped.endsWith('/api') ? _stripped : `${_stripped}/api`;
+
+// Debug: log resolved API base in development
+if (import.meta.env.DEV) {
+  console.log('[LiFixify] API_BASE →', API_BASE);
+}
 
 const getHeaders = () => {
   const token = localStorage.getItem('lifixify_token');
