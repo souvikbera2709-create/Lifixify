@@ -3,10 +3,25 @@
  * Connects frontend modules to Express/MongoDB/Gemini backend
  */
 
-const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
-const API_BASE = rawBaseUrl.replace(/\/+$/, "").endsWith("/api")
-  ? rawBaseUrl.replace(/\/+$/, "")
-  : `${rawBaseUrl.replace(/\/+$/, "")}/api`;
+// ── API Base URL ─────────────────────────────────────────────────────
+// In development: reads from frontend/.env (VITE_API_BASE_URL=http://localhost:5001)
+// In production:  MUST be set in Vercel dashboard → Settings → Environment Variables
+//                 e.g. VITE_API_BASE_URL = https://lifixify.onrender.com
+const _envUrl = import.meta.env.VITE_API_BASE_URL;
+
+if (!_envUrl && import.meta.env.PROD) {
+  console.error(
+    '[LiFixify] ⚠️  VITE_API_BASE_URL is not set!\n' +
+    'Go to Vercel Dashboard → Project Settings → Environment Variables\n' +
+    'and add:  VITE_API_BASE_URL = https://lifixify.onrender.com'
+  );
+}
+
+const rawBaseUrl = _envUrl || 'http://localhost:5001';
+
+// Normalise: strip trailing slashes, then ensure path ends with /api exactly once
+const _stripped = rawBaseUrl.replace(/\/+$/, '');
+const API_BASE = _stripped.endsWith('/api') ? _stripped : `${_stripped}/api`;
 
 const getHeaders = () => {
   const token = localStorage.getItem('lifixify_token');
