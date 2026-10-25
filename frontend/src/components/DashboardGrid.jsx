@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { useStore, calculateLevelFromXp, getRankTitle } from '../store/useStore';
+import { useStore, calculateLevelFromXp, getRankTitle, checkIsStreakActiveToday } from '../store/useStore';
 import { ChallengeEngine } from './ChallengeEngine';
 import { FitnessNutritionHub } from './FitnessNutritionHub';
 import { FinanceHub } from './FinanceHub';
 import { StudyBuddyHub } from './StudyBuddyHub';
 import {
   Sparkles, Trash2, Plus, Check, Zap, Coins, X, Flame, Trophy,
-  ArrowUpRight, ShoppingBag, ShieldCheck
+  ArrowUpRight, ShoppingBag, ShieldCheck, Clock
 } from 'lucide-react';
 
 // Custom Module Card with equalized styling
@@ -150,11 +150,13 @@ const CustomModuleCard = ({ cm }) => {
 
 // ── Top Summary Stat Cards Row Component (Only visible on Main Dashboard view) ──
 const TopSummaryStatsCards = ({ user, isDark, setActiveSidePanel }) => {
+  const { recordQualifyingActivity } = useStore();
   const safeUser = user || {};
   const level = calculateLevelFromXp(safeUser.xp || 0);
   const rankTitle = getRankTitle(level);
   const xpInLvl = (safeUser.xp || 0) % 500;
   const progress = Math.min(100, (xpInLvl / 500) * 100);
+  const isStreakActive = checkIsStreakActiveToday(safeUser);
 
   const statCardBg = isDark
     ? "bg-[#111e18] border-[#1a2f26]"
@@ -217,26 +219,57 @@ const TopSummaryStatsCards = ({ user, isDark, setActiveSidePanel }) => {
       </div>
 
       {/* Metric 3: Active Streak */}
-      <div className={`p-5 rounded-3xl border flex flex-col justify-between transition-all hover:border-[#C2E7D3] ${statCardBg}`}>
+      <div className={`p-5 rounded-3xl border flex flex-col justify-between transition-all ${
+        isStreakActive 
+          ? `hover:border-[#FED7AA] ${statCardBg}` 
+          : `hover:border-[#E5E7EB] ${statCardBg}`
+      }`}>
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280]">Discipline Streak</span>
-          <div className="w-10 h-10 rounded-2xl bg-[#FFF7ED] border border-[#FED7AA] flex items-center justify-center text-[#EA580C]">
-            <Flame className="w-5 h-5 fill-[#EA580C] animate-pulse" />
+          <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center transition-all ${
+            isStreakActive
+              ? "bg-[#FFF7ED] border-[#FED7AA] text-[#EA580C]"
+              : isDark
+                ? "bg-[#14261f] border-[#1a2f26] text-slate-500"
+                : "bg-[#F4F6F5] border-[#E5E7EB] text-[#9CA3AF]"
+          }`}>
+            <Flame className={`w-5 h-5 ${isStreakActive ? "fill-[#EA580C] text-[#EA580C] animate-pulse" : "text-current"}`} />
           </div>
         </div>
         <div className="mt-2">
-          <h3 className={`font-display font-black text-2xl ${isDark ? 'text-white' : 'text-[#111827]'}`}>
-            {safeUser.streak || 0} <span className="text-sm font-bold text-[#6B7280]">Days</span>
+          <h3 className={`font-display font-black text-2xl ${
+            isStreakActive 
+              ? (isDark ? 'text-white' : 'text-[#111827]') 
+              : 'text-[#6B7280]'
+          }`}>
+            {isStreakActive ? (safeUser.streak || 1) : (safeUser.streak || 0)} <span className="text-sm font-bold text-[#6B7280]">Days</span>
           </h3>
           <p className="text-xs text-[#6B7280] mt-0.5">
-            Unbroken Daily Rhythm
+            {isStreakActive ? "Unbroken Daily Rhythm" : "Complete a task today to ignite streak"}
           </p>
         </div>
         <div className="mt-3 pt-3 border-t border-[#EEF2F0] flex items-center justify-between">
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FFF7ED] text-[#C2410C] font-bold border border-[#FED7AA] flex items-center gap-1">
-            <ShieldCheck className="w-3 h-3 text-[#EA580C]" /> Streak Active
-          </span>
-          <span className="text-[10px] font-mono text-[#6B7280]">x1.2 Multiplier</span>
+          {isStreakActive ? (
+            <>
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#E6F4ED] text-[#124F34] font-bold border border-[#C2E7D3] flex items-center gap-1 shadow-sm">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" /> Streak Active
+              </span>
+              <span className="text-[10px] font-mono text-[#124F34] font-bold">x1.2 Multiplier</span>
+            </>
+          ) : (
+            <>
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#F4F6F5] text-[#6B7280] font-bold border border-[#E5E7EB] flex items-center gap-1">
+                <Clock className="w-3 h-3 text-[#9CA3AF]" /> No active streak yet
+              </span>
+              <button
+                onClick={() => recordQualifyingActivity()}
+                className="text-[10px] font-mono text-[#124F34] hover:underline font-bold cursor-pointer"
+                title="Perform daily check-in"
+              >
+                Check In Now
+              </button>
+            </>
+          )}
         </div>
       </div>
 

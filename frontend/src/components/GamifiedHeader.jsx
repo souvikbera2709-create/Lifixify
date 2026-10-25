@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStore, calculateLevelFromXp } from '../store/useStore';
+import { useStore, calculateLevelFromXp, checkIsStreakActiveToday } from '../store/useStore';
 import { Zap, Flame, Trophy } from 'lucide-react';
 
 export const GamifiedHeader = () => {
@@ -10,6 +10,7 @@ export const GamifiedHeader = () => {
   const level     = calculateLevelFromXp(safeUser.xp || 0);
   const xpInLvl   = (safeUser.xp || 0) % 500;
   const progress  = Math.min(100, (xpInLvl / 500) * 100);
+  const isStreakActive = checkIsStreakActiveToday(safeUser);
 
   /* Only shown on mobile — desktop uses LeftSidebar */
   return (
@@ -42,8 +43,15 @@ export const GamifiedHeader = () => {
 
         {/* Quick stats */}
         <div className="flex items-center gap-1.5 shrink-0">
-          <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-[#FFF7ED] border border-[#FED7AA] text-[#C2410C] text-xs font-mono font-bold">
-            <Flame className="w-3 h-3 fill-[#EA580C]" />{safeUser.streak || 0}
+          <div className={`flex items-center gap-1 px-2 py-1 rounded-xl border text-xs font-mono font-bold transition-all ${
+            isStreakActive
+              ? "bg-[#FFF7ED] border-[#FED7AA] text-[#C2410C]"
+              : isDark
+                ? "bg-[#14261f] border-[#1a2f26] text-slate-500"
+                : "bg-[#F4F6F5] border-[#E5E7EB] text-[#6B7280]"
+          }`}>
+            <Flame className={`w-3 h-3 ${isStreakActive ? "fill-[#EA580C]" : "text-[#9CA3AF]"}`} />
+            {isStreakActive ? (safeUser.streak || 1) : (safeUser.streak || 0)}
           </div>
           <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-[#E6F4ED] border border-[#C2E7D3] text-[#124F34] text-xs font-mono font-bold">
             <Zap className="w-3 h-3 fill-[#10B981]" />{safeUser.xp || 0}

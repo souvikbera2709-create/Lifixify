@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 export const ChallengeEngine = () => {
-  const { addXp, addCoins, isDark } = useStore();
+  const { addXp, addCoins, isDark, recordQualifyingActivity } = useStore();
   const [challenges, setChallenges] = useState([]);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
   const [selectedDayNumber, setSelectedDayNumber] = useState(1);
@@ -146,6 +146,7 @@ export const ChallengeEngine = () => {
     if (targetStatus) {
       addXp(25);
       addCoins(5);
+      try { recordQualifyingActivity(); } catch {}
     }
 
     try {

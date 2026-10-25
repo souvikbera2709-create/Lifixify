@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useStore, calculateLevelFromXp, getRankTitle } from "../store/useStore";
+import { useStore, calculateLevelFromXp, getRankTitle, checkIsStreakActiveToday } from "../store/useStore";
 import {
   User, Trophy, ShoppingBag, Flame, Zap, Coins,
   Volume2, VolumeX, Sun, Moon, Sparkles, ChevronRight, LayoutDashboard, LogOut
@@ -22,6 +22,7 @@ export const LeftSidebar = () => {
   const rankTitle = getRankTitle(level);
   const xpInLvl   = (safeUser.xp || 0) % 500;
   const progress  = Math.min(100, (xpInLvl / 500) * 100);
+  const isStreakActive = checkIsStreakActiveToday(safeUser);
 
   const sideBg  = isDark ? "bg-[#111e18] border-[#1a2f26]" : "bg-white border-[#EEF2F0]";
   const textPrimary = isDark ? "text-slate-100" : "text-[#111827]";
@@ -113,10 +114,16 @@ export const LeftSidebar = () => {
 
         {/* Stat Chips */}
         <div className="grid grid-cols-3 gap-2 px-0.5">
-          <div className="flex flex-col items-center py-2.5 rounded-2xl border bg-[#FFF7ED] border-[#FED7AA] text-[#C2410C]">
-            <Flame className="w-3.5 h-3.5 fill-[#EA580C] text-[#EA580C] animate-pulse" />
-            <span className="font-mono font-black text-sm mt-0.5">{safeUser.streak || 0}</span>
-            <span className="text-[9px] font-bold uppercase tracking-wider opacity-80">Streak</span>
+          <div className={`flex flex-col items-center py-2.5 rounded-2xl border transition-all ${
+            isStreakActive
+              ? "bg-[#FFF7ED] border-[#FED7AA] text-[#C2410C]"
+              : isDark
+                ? "bg-[#14261f] border-[#1a2f26] text-slate-500"
+                : "bg-[#F4F6F5] border-[#E5E7EB] text-[#6B7280]"
+          }`}>
+            <Flame className={`w-3.5 h-3.5 ${isStreakActive ? "fill-[#EA580C] text-[#EA580C] animate-pulse" : "text-[#9CA3AF]"}`} />
+            <span className="font-mono font-black text-sm mt-0.5">{isStreakActive ? (safeUser.streak || 1) : (safeUser.streak || 0)}</span>
+            <span className="text-[9px] font-bold uppercase tracking-wider opacity-80">{isStreakActive ? "Streak" : "Unlit"}</span>
           </div>
           <div className="flex flex-col items-center py-2.5 rounded-2xl border bg-[#FFFBEB] border-[#FDE68A] text-[#B45309]">
             <Coins className="w-3.5 h-3.5 text-[#D97706]" />

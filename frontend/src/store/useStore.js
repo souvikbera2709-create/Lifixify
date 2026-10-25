@@ -18,6 +18,26 @@ export const calculateLevelFromXp = (xp) => {
   return Math.floor(safeXp / 500) + 1;
 };
 
+export const getTodayKey = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
+export const checkIsStreakActiveToday = (user) => {
+  const today = getTodayKey();
+  try {
+    const stored = localStorage.getItem("lifixify_last_qualifying_date");
+    if (stored === today) return true;
+  } catch {}
+  if (user?.lastQualifyingDate) {
+    const userDate = typeof user.lastQualifyingDate === "string"
+      ? user.lastQualifyingDate.split("T")[0]
+      : new Date(user.lastQualifyingDate).toISOString().split("T")[0];
+    if (userDate === today) return true;
+  }
+  return false;
+};
+
 export const fireLevelUpConfetti = () => {
   try {
     const duration = 2.5 * 1000;
@@ -153,6 +173,28 @@ export const useStore = create((set, get) => ({
       )
     }));
   },
+  lastQualifyingDate: (() => {
+    try { return localStorage.getItem("lifixify_last_qualifying_date") || null; } catch { return null; }
+  })(),
+
+  recordQualifyingActivity: () => {
+    try { sounds.playCoin(); } catch {}
+    const today = getTodayKey();
+    try { localStorage.setItem("lifixify_last_qualifying_date", today); } catch {}
+    set(s => {
+      const curStreak = Number(s.user?.streak) || 0;
+      const newStreak = curStreak > 0 ? curStreak : 1;
+      return {
+        lastQualifyingDate: today,
+        user: {
+          ...(s.user || DEFAULT_USER),
+          streak: newStreak,
+          lastQualifyingDate: today
+        }
+      };
+    });
+  },
+
   toggleModuleTask: (moduleId, taskId) => {
     set(s => {
       const updated = (s.customModules || []).map(m => {
@@ -163,6 +205,7 @@ export const useStore = create((set, get) => ({
           if (nowCompleted) {
             setTimeout(() => get().addXp(25), 0);
             setTimeout(() => get().addCoins(5), 0);
+            setTimeout(() => get().recordQualifyingActivity(), 0);
           }
           return { ...t, completed: nowCompleted };
         });

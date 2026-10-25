@@ -29,7 +29,7 @@ const DEFAULT_PRESETS = [
 ];
 
 export const StudyBuddyHub = () => {
-  const { addXp, addCoins, isDark } = useStore();
+  const { addXp, addCoins, isDark, recordQualifyingActivity } = useStore();
 
   // Custom Preset State from localStorage
   const [customPreset, setCustomPreset] = useState(() => {
@@ -167,6 +167,7 @@ export const StudyBuddyHub = () => {
     const sessionSubject = subject.trim() || "Deep Work";
 
     if (!isBreak) {
+      try { recordQualifyingActivity(); } catch {}
       const xpEarned = duration;
       const coinsEarned = Math.max(1, Math.floor(duration / 10));
 
