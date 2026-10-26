@@ -135,12 +135,16 @@ export const useStore = create((set, get) => ({
       return false;
     }
     try { sounds.playCoin(); } catch {}
+    const historyEntry = {
+      id: reward.id,
+      title: reward.title,
+      cost: reward.cost,
+      category: reward.category || 'General',
+      redeemedAt: new Date().toISOString()
+    };
     set(s => ({
       user: { ...s.user, coins: Math.max(0, userCoins - reward.cost) },
-      redeemedHistory: [
-        { ...reward, redeemedAt: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) },
-        ...(s.redeemedHistory || [])
-      ]
+      redeemedHistory: [historyEntry, ...(s.redeemedHistory || [])]
     }));
     return true;
   },
@@ -148,6 +152,23 @@ export const useStore = create((set, get) => ({
   addCustomReward: (reward) => {
     try { sounds.playCoin(); } catch {}
     set(s => ({ shopRewards: [...(s.shopRewards || []), { id: Date.now(), ...reward }] }));
+  },
+
+  deleteReward: (rewardId) => {
+    try { sounds.playClick(); } catch {}
+    set(s => ({ shopRewards: (s.shopRewards || []).filter(r => r.id !== rewardId) }));
+  },
+
+  deleteHistoryEntry: (index) => {
+    try { sounds.playClick(); } catch {}
+    set(s => ({
+      redeemedHistory: (s.redeemedHistory || []).filter((_, i) => i !== index)
+    }));
+  },
+
+  clearHistory: () => {
+    try { sounds.playClick(); } catch {}
+    set(() => ({ redeemedHistory: [] }));
   },
 
   // Custom Modules
