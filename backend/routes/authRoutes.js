@@ -27,14 +27,21 @@ const sendTokenResponse = (user, statusCode, res, message = 'Success') => {
     token,
     user: {
       id: user._id,
+      _id: user._id,
       name: user.name,
       email: user.email,
+      avatar: user.avatar || '🧠',
       level: user.level,
       xp: user.xp,
       coins: user.coins,
       streak: user.streak,
-      unlockedBadges: user.unlockedBadges,
-      customSections: user.customSections,
+      lastQualifyingDate: user.lastQualifyingDate || null,
+      settings: user.settings || { isDark: false, isMuted: false },
+      customModules: user.customModules || [],
+      shopRewards: user.shopRewards || [],
+      redeemedHistory: user.redeemedHistory || [],
+      unlockedBadges: user.unlockedBadges || [],
+      customSections: user.customSections || [],
       createdAt: user.createdAt
     }
   });
@@ -122,7 +129,8 @@ router.post('/logout', verifyToken, (req, res) => {
 // @route   GET /api/auth/me
 router.get('/me', verifyToken, async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
     res.status(200).json({ success: true, user });
   } catch (err) {
     next(err);

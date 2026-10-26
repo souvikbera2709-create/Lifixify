@@ -11,6 +11,7 @@ const fitnessRoutes = require('./routes/fitnessRoutes');
 const financeRoutes = require('./routes/financeRoutes');
 const studyRoutes = require('./routes/studyRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
@@ -65,6 +66,7 @@ app.use('/api/fitness', fitnessRoutes);
 app.use('/api/finance', financeRoutes);
 app.use('/api/study', studyRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/users', userRoutes);
 
 // Error Handler
 app.use((err, req, res, next) => {

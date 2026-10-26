@@ -17,8 +17,19 @@ import {
 
 export const ChallengeEngine = () => {
   const { addXp, addCoins, isDark, recordQualifyingActivity } = useStore();
-  const [challenges, setChallenges] = useState([]);
-  const [selectedChallenge, setSelectedChallenge] = useState(null);
+  const [challenges, setChallenges] = useState(() => {
+    try {
+      const saved = localStorage.getItem('lifixify_challenges');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+  const [selectedChallenge, setSelectedChallenge] = useState(() => {
+    try {
+      const saved = localStorage.getItem('lifixify_challenges');
+      const list = saved ? JSON.parse(saved) : [];
+      return list.length > 0 ? list[0] : null;
+    } catch { return null; }
+  });
   const [selectedDayNumber, setSelectedDayNumber] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -74,6 +85,15 @@ export const ChallengeEngine = () => {
   useEffect(() => {
     fetchChallenges();
   }, []);
+
+  // Persist challenges locally on change
+  useEffect(() => {
+    try {
+      if (challenges && challenges.length > 0) {
+        localStorage.setItem('lifixify_challenges', JSON.stringify(challenges));
+      }
+    } catch {}
+  }, [challenges]);
 
   const handleCreateChallenge = async (e) => {
     e.preventDefault();

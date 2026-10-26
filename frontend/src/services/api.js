@@ -320,6 +320,26 @@ export const api = {
     }
   },
 
+  // User profile sync
+  users: {
+    getProfile: async () => {
+      const res = await fetch(`${API_BASE}/users/profile`, {
+        headers: getHeaders(),
+        credentials: 'include'
+      });
+      return handleResponse(res);
+    },
+    updateProfile: async (patch) => {
+      const res = await fetch(`${API_BASE}/users/profile`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        credentials: 'include',
+        body: JSON.stringify(patch)
+      });
+      return handleResponse(res);
+    }
+  },
+
   // AI Life Coach
   ai: {
     askCoach: async (message) => {

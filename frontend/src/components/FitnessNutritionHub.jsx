@@ -24,6 +24,22 @@ const today = () => new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
 const KEY_TARGETS = 'lifixify_fitness_targets';
 const KEY_CONSUMED = 'lifixify_fitness_consumed_';
 const KEY_WATER    = 'lifixify_water_';
+const KEY_WORKOUTS = 'lifixify_workouts_';
+const KEY_CUSTOM_EXERCISES = 'lifixify_custom_exercises';
+
+function loadWorkouts() {
+  try { return JSON.parse(localStorage.getItem(KEY_WORKOUTS + today())) || []; } catch { return []; }
+}
+function saveWorkouts(w) {
+  try { localStorage.setItem(KEY_WORKOUTS + today(), JSON.stringify(w)); } catch {}
+}
+
+function loadCustomExercises() {
+  try { return JSON.parse(localStorage.getItem(KEY_CUSTOM_EXERCISES)) || []; } catch { return []; }
+}
+function saveCustomExercises(exs) {
+  try { localStorage.setItem(KEY_CUSTOM_EXERCISES, JSON.stringify(exs)); } catch {}
+}
 
 const DEFAULT_TARGETS = { calories: 0, protein: 0, carbs: 0, fats: 0, waterMl: 0 };
 const DEFAULT_CONSUMED = { calories: 0, protein: 0, carbs: 0, fats: 0 };
@@ -55,7 +71,7 @@ export const FitnessNutritionHub = () => {
   const [activeTab, setActiveTab] = useState('workouts');
 
   // ── Workout state ──────────────────────────────────────────────
-  const [workouts,           setWorkouts]           = useState([]);
+  const [workouts,           setWorkouts]           = useState(loadWorkouts);
   const [selectedExercise,   setSelectedExercise]   = useState(PRESET_EXERCISES[0]);
   const [customExerciseName, setCustomExerciseName] = useState("");
   const [setsInput,          setSetsInput]          = useState(3);
@@ -85,7 +101,7 @@ export const FitnessNutritionHub = () => {
   const [draftTargets, setDraftTargets] = useState(targets);
 
   // ── Custom Exercise Manager ───────────────────────────────────
-  const [customExercises,    setCustomExercises]    = useState([]);
+  const [customExercises,    setCustomExercises]    = useState(loadCustomExercises);
   const [showManageEx,       setShowManageEx]       = useState(false);
   const [newExName,          setNewExName]          = useState('');
   const [newExCategory,      setNewExCategory]      = useState('Strength');
@@ -149,9 +165,11 @@ export const FitnessNutritionHub = () => {
     fetchCustomExercises();
   }, [fetchCustomExercises]);
 
-  // Persist consumed on change
+  // Persist consumed, water, workouts, and custom exercises on change
   useEffect(() => { saveConsumed(consumed); }, [consumed]);
   useEffect(() => { saveWater(waterMl); }, [waterMl]);
+  useEffect(() => { saveWorkouts(workouts); }, [workouts]);
+  useEffect(() => { saveCustomExercises(customExercises); }, [customExercises]);
 
   // ── Check & award goal completion ─────────────────────────────
   const tryAwardGoal = useCallback((key, met) => {

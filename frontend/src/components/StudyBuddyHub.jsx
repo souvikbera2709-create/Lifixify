@@ -65,8 +65,12 @@ export const StudyBuddyHub = () => {
   });
 
   const [isActive, setIsActive] = useState(false);
-  const [subject, setSubject] = useState("Deep Work");
-  const [sessionNotes, setSessionNotes] = useState("");
+  const [subject, setSubject] = useState(() => {
+    try { return localStorage.getItem("lifixify_study_subject") || "Deep Work"; } catch { return "Deep Work"; }
+  });
+  const [sessionNotes, setSessionNotes] = useState(() => {
+    try { return localStorage.getItem("lifixify_study_notes") || ""; } catch { return ""; }
+  });
 
   // Custom Duration Modal / Popover State
   const [showCustomModal, setShowCustomModal] = useState(false);
@@ -101,6 +105,15 @@ export const StudyBuddyHub = () => {
   useEffect(() => {
     fetchStudyData();
   }, []);
+
+  // Persist study subject & notes
+  useEffect(() => {
+    try { localStorage.setItem("lifixify_study_subject", subject); } catch {}
+  }, [subject]);
+
+  useEffect(() => {
+    try { localStorage.setItem("lifixify_study_notes", sessionNotes); } catch {}
+  }, [sessionNotes]);
 
   // Countdown timer effect
   useEffect(() => {

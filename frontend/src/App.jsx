@@ -21,6 +21,62 @@ function AppContent() {
 
   const [initializing, setInitializing] = useState(true);
 
+  // ── Sync URL on Mount & Popstate (Deep Link & Hard Refresh Resilience) ──
+  useEffect(() => {
+    const handleUrlRoute = () => {
+      const path = (window.location.pathname || "/").replace(/\/+$/, "");
+      if (path === "/rewards") {
+        useStore.getState().setActiveSidePanel("rewards");
+      } else if (path === "/leaderboard") {
+        useStore.getState().setActiveSidePanel("leaderboard");
+      } else if (path === "/study") {
+        useStore.getState().setActiveSidePanel(null);
+        useStore.getState().setActiveModuleFilter("Study & Focus");
+      } else if (path === "/fitness") {
+        useStore.getState().setActiveSidePanel(null);
+        useStore.getState().setActiveModuleFilter("Fitness & Body");
+      } else if (path === "/finance") {
+        useStore.getState().setActiveSidePanel(null);
+        useStore.getState().setActiveModuleFilter("Finance Hub");
+      } else if (path === "/challenges") {
+        useStore.getState().setActiveSidePanel(null);
+        useStore.getState().setActiveModuleFilter("Multi-Day Challenges");
+      } else if (path === "/dashboard" || path === "") {
+        useStore.getState().setActiveSidePanel(null);
+        useStore.getState().setActiveModuleFilter("All Modules");
+      }
+    };
+
+    handleUrlRoute();
+    window.addEventListener("popstate", handleUrlRoute);
+    return () => window.removeEventListener("popstate", handleUrlRoute);
+  }, []);
+
+  // ── Reflect Navigation Changes in URL Bar ──
+  const activeModuleFilter = useStore(s => s.activeModuleFilter);
+  useEffect(() => {
+    let target = "/dashboard";
+    if (activeSidePanel === "rewards") {
+      target = "/rewards";
+    } else if (activeSidePanel === "leaderboard") {
+      target = "/leaderboard";
+    } else if (activeModuleFilter === "Study & Focus") {
+      target = "/study";
+    } else if (activeModuleFilter === "Fitness & Body") {
+      target = "/fitness";
+    } else if (activeModuleFilter === "Finance Hub") {
+      target = "/finance";
+    } else if (activeModuleFilter === "Multi-Day Challenges") {
+      target = "/challenges";
+    } else if (activeModuleFilter === "All Modules") {
+      target = "/dashboard";
+    }
+
+    if (window.location.pathname !== target && window.location.pathname !== "/") {
+      window.history.replaceState(null, "", target);
+    }
+  }, [activeSidePanel, activeModuleFilter]);
+
   // Watchdog-backed session verification
   useEffect(() => {
     let cancelled = false;
