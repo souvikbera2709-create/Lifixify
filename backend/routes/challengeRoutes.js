@@ -210,4 +210,44 @@ router.delete('/:id', async (req, res, next) => {
   }
 });
 
+
+// @route   DELETE /api/challenges/:id/day/:dayNumber/task/:taskId
+// Remove an individual quest from a specific day
+router.delete('/:id/day/:dayNumber/task/:taskId', async (req, res, next) => {
+  try {
+    const { id, dayNumber, taskId } = req.params;
+
+    const challenge = await Challenge.findOne({ _id: id, userId: req.user.id });
+    if (!challenge) {
+      return res.status(404).json({ success: false, message: 'Challenge not found' });
+    }
+
+    const day = challenge.daysData.find((d) => d.dayNumber === parseInt(dayNumber, 10));
+    if (!day) {
+      return res.status(404).json({ success: false, message: `Day ${dayNumber} not found` });
+    }
+
+    const taskIndex = day.tasks.findIndex((t) => t._id.toString() === taskId);
+    if (taskIndex === -1) {
+      return res.status(404).json({ success: false, message: 'Task not found' });
+    }
+
+    day.tasks.splice(taskIndex, 1);
+    // Recalculate day completion
+    day.completedStatus = day.tasks.length > 0 && day.tasks.every((t) => t.completed);
+    // Recalculate challenge completion
+    if (challenge.daysData.every((d) => d.completedStatus)) {
+      challenge.status = 'completed';
+    } else {
+      challenge.status = 'active';
+    }
+
+    await challenge.save();
+
+    res.status(200).json({ success: true, message: 'Quest removed', challenge });
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;

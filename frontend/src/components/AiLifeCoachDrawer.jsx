@@ -145,7 +145,7 @@ export const AiLifeCoachDrawer = () => {
             </div>
 
             {/* Messages Thread */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3.5">
+            <div className="flex-1 overflow-y-auto min-h-0 p-4 space-y-3.5">
               {messages.map((msg, index) => {
                 const isAssistant = msg.role === 'assistant';
                 return (
@@ -172,7 +172,7 @@ export const AiLifeCoachDrawer = () => {
                           : 'bg-[#124F34] text-white font-medium shadow-sm'
                       }`}
                     >
-                      <p className="whitespace-pre-wrap">{msg.text}</p>
+                      <p className="whitespace-pre-wrap break-words">{msg.text}</p>
                     </div>
                   </div>
                 );

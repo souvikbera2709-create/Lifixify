@@ -37,7 +37,7 @@ const callGemini = async (prompt, systemInstruction = '', jsonMode = false) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents,
-          generationConfig: { temperature: jsonMode ? 0.2 : 0.7, maxOutputTokens: 1024 }
+          generationConfig: { temperature: jsonMode ? 0.2 : 0.7, maxOutputTokens: 2048 }
         }),
         signal: controller.signal
       });

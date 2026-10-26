@@ -203,6 +203,50 @@ export const ChallengeEngine = () => {
     alert('🎉 Grand Challenge Milestone Claimed! +250 XP and +100 Coins awarded!');
   };
 
+
+  // Delete an entire challenge/campaign
+  const handleDeleteChallenge = async (challengeId, e) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this campaign? This action cannot be undone.')) return;
+
+    const updated = challenges.filter((c) => c._id !== challengeId);
+    setChallenges(updated);
+    if (selectedChallenge?._id === challengeId) {
+      setSelectedChallenge(updated.length > 0 ? updated[0] : null);
+      setSelectedDayNumber(1);
+    }
+    try {
+      await api.challenges.delete(challengeId);
+    } catch (e) {
+      // Optimistic update maintained for local-only challenges
+    }
+  };
+
+  // Remove an individual quest from a specific day
+  const handleRemoveQuest = async (taskId, e) => {
+    e.stopPropagation();
+    if (!selectedChallenge) return;
+
+    const updatedDays = selectedChallenge.daysData.map((d) => {
+      if (d.dayNumber === selectedDayNumber) {
+        const updatedTasks = d.tasks.filter((t) => t._id !== taskId);
+        const allCompleted = updatedTasks.length > 0 && updatedTasks.every((t) => t.completed);
+        return { ...d, tasks: updatedTasks, completedStatus: allCompleted };
+      }
+      return d;
+    });
+
+    const updatedChallenge = { ...selectedChallenge, daysData: updatedDays };
+    setSelectedChallenge(updatedChallenge);
+    setChallenges(challenges.map((c) => (c._id === selectedChallenge._id ? updatedChallenge : c)));
+
+    try {
+      await api.challenges.removeTask(selectedChallenge._id, selectedDayNumber, taskId);
+    } catch (e) {
+      // Optimistic update maintained
+    }
+  };
+
   // Active day calculations
   const activeDay = selectedChallenge?.daysData?.find((d) => d.dayNumber === selectedDayNumber);
   const totalCompletedDays = selectedChallenge?.daysData?.filter((d) => d.completedStatus).length || 0;
@@ -345,13 +389,22 @@ export const ChallengeEngine = () => {
                       : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-display font-bold text-sm text-white truncate max-w-[170px]">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-display font-bold text-sm text-white truncate max-w-[140px]">
                       {c.title}
                     </span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-purple-300">
-                      {c.totalDays}D
-                    </span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-purple-300">
+                        {c.totalDays}D
+                      </span>
+                      <button
+                        onClick={(e) => handleDeleteChallenge(c._id, e)}
+                        title="Delete campaign"
+                        className="p-1 rounded-lg text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Progress bar */}
@@ -455,9 +508,18 @@ export const ChallengeEngine = () => {
                         )}
                         <span className="text-xs font-medium truncate">{task.taskName}</span>
                       </div>
-                      <span className="text-xs font-mono font-bold text-emerald-400 shrink-0">
-                        +{task.xpReward || 25} XP
-                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-xs font-mono font-bold text-emerald-400">
+                          +{task.xpReward || 25} XP
+                        </span>
+                        <button
+                          onClick={(e) => handleRemoveQuest(task._id, e)}
+                          title="Remove quest"
+                          className="p-1 rounded-lg text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}

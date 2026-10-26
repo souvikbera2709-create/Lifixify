@@ -176,6 +176,17 @@ export const api = {
         credentials: 'include'
       });
       return handleResponse(res);
+    },
+    removeTask: async (challengeId, dayNumber, taskId) => {
+      const res = await fetch(
+        `${API_BASE}/challenges/${challengeId}/day/${dayNumber}/task/${taskId}`,
+        {
+          method: 'DELETE',
+          headers: getHeaders(),
+          credentials: 'include'
+        }
+      );
+      return handleResponse(res);
     }
   },
 
